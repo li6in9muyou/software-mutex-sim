@@ -1,1 +1,1 @@
-# Software Mutaual Exclusion Algorithm Simulation
+# Software Mutual Exclusion Algorithm Simulation

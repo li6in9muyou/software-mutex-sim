@@ -35,3 +35,7 @@ export const critical_region = (visitor) =>
   use_critical_region(visitor)(async () => {
     await Idle();
   });
+
+export const critical_region_new = async () => {
+  await Idle();
+};
