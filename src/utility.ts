@@ -1,3 +1,5 @@
+import { use_critical_region } from "./SveltePort";
+
 export const sleep = async (duration = 1000) => {
   await new Promise((resolve) => setTimeout(resolve, duration));
 };
@@ -14,14 +16,22 @@ export const Idle = async (duration = 2) => {
 export class Clock {
   start: number;
   end: number;
+
   tick() {
     this.start = window.performance.now();
   }
+
   tock(): Clock {
     this.end = window.performance.now();
     return this;
   }
+
   report(): number {
     return this.end - this.start;
   }
 }
+
+export const critical_region = (visitor) =>
+  use_critical_region(visitor)(async () => {
+    await Idle();
+  });

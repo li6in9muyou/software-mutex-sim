@@ -1,15 +1,9 @@
-import { use_critical_region } from "../../SveltePort";
-import { Idle, Yield } from "../../utility";
+import { critical_region, Yield } from "../../utility";
 import portBuilder from "./DekkerPort";
 
 export function counterpart(id) {
   return id === 1 ? 0 : 1;
 }
-
-const critical_region = (visitor) =>
-  use_critical_region(visitor)(async () => {
-    await Idle();
-  });
 
 async function process_x(id) {
   const port = portBuilder(id);
