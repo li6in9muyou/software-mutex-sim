@@ -1,6 +1,6 @@
 import { Yield } from "../../utility";
 
-const process_count = 10;
+export const process_count = 10;
 const level = Array(process_count).fill(0);
 const victim = Array(process_count).fill(-999);
 
@@ -30,3 +30,5 @@ export async function lock(me) {
 export async function unlock(me) {
   level[me] = 0;
 }
+
+export function process_create(id) {}
