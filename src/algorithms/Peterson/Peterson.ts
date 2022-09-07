@@ -1,10 +1,8 @@
-import { Yield } from "../../utility";
+import { Yield, Idle } from "../../utility";
 
-export const process_count = 10;
-const l = new SharedArrayBuffer(process_count);
-const v = new SharedArrayBuffer(process_count);
+const process_count = 10;
 
-function should_wait(who, now) {
+function should_wait(who, now, l, v) {
   const level = new Int8Array(l);
   const victim = new Int8Array(v);
   for (let k = 0; k < process_count; k++) {
@@ -15,21 +13,39 @@ function should_wait(who, now) {
   return false;
 }
 
-export async function lock(me) {
+async function lock(me, l, v) {
   const level = new Int8Array(l);
   const victim = new Int8Array(v);
-  console.log(me, "trys to lock", Array.from(level), Array.from(victim));
   for (let i = 1; i < process_count; i++) {
-    level[me] = i + 1;
+    level[me] = i;
     victim[i] = me;
-    console.log(Array.from(level), Array.from(victim));
     do {
       await Yield();
-    } while (should_wait(me, i));
+    } while (should_wait(me, i, l, v));
   }
 }
 
-export async function unlock(me) {
+function unlock(me, l) {
   const level = new Int8Array(l);
   level[me] = 0;
 }
+
+async function lock_adapter(d) {
+  const { me, level: l, victim: v } = d;
+  await lock(me, l, v);
+}
+
+function unlock_adapter(d) {
+  const { me, level: l } = d;
+  unlock(me, l);
+}
+
+self.onmessage = async (ev) => {
+  self.postMessage("locking");
+  await lock_adapter(ev.data);
+  self.postMessage("entered");
+  await Idle();
+  self.postMessage("done");
+  unlock_adapter(ev.data);
+  self.postMessage("unlocked");
+};
