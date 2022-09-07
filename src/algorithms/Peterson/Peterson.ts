@@ -2,11 +2,16 @@ import { Yield, Idle } from "../../utility";
 
 const process_count = 10;
 
-function should_wait(who, now, l, v) {
+function should_wait(me, waiting_room_idx, l, v) {
   const level = new Int8Array(l);
   const victim = new Int8Array(v);
-  for (let k = 0; k < process_count; k++) {
-    if (k !== who && level[k] >= now && victim[now] == who) {
+
+  for (let proc = 0; proc < process_count; proc++) {
+    if (
+      proc !== me &&
+      level[proc] >= waiting_room_idx &&
+      victim[waiting_room_idx] === me
+    ) {
       return true;
     }
   }
