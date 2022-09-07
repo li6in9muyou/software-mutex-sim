@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import { level_store, process_count, victim_store } from "./Peterson";
+  import { process_count } from "./Peterson";
 
   console.info("Peterson's begins");
   onMount(() => {
@@ -18,8 +18,8 @@
 <section>
   <h1>Peterson's Algorithm</h1>
   <h2>Global Memory</h2>
-  <p>level: {$level_store}</p>
-  <p>victim: {$victim_store}</p>
+  <p>level:</p>
+  <p>victim:</p>
   <h2>overview</h2>
   <p>process_status:</p>
   <p>those in critical region:</p>
