@@ -69,14 +69,14 @@ export class SveltePort {
     });
   }
 
-  private pre_critical_region(id) {
+  pre_critical_region(id) {
     this.process_status.update((status) => {
       status[id] = true;
       return status;
     });
   }
 
-  private post_critical_region(id) {
+  post_critical_region(id) {
     this.process_status.update((status) => {
       status[id] = false;
       return status;

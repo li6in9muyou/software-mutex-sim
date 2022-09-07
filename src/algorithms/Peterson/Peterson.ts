@@ -43,11 +43,10 @@ function unlock_adapter(d) {
 }
 
 self.onmessage = async (ev) => {
-  self.postMessage("locking");
   await lock_adapter(ev.data);
-  self.postMessage("entered");
+  self.postMessage({ type: "pre", who: ev.data.me });
   await Idle();
-  self.postMessage("done");
+  self.postMessage({ type: "post", who: ev.data.me });
   unlock_adapter(ev.data);
-  self.postMessage("unlocked");
+  self.postMessage({ type: "done", who: ev.data.me });
 };
