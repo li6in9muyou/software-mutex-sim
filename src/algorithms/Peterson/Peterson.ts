@@ -1,21 +1,17 @@
 import { Yield, Idle } from "../../utility";
+import { every } from "lodash";
 
 const process_count = 10;
 
-function should_wait(me, waiting_room_idx, l, v) {
+function can_proceed(me, waiting_room_idx, l, v) {
   const level = new Int8Array(l);
   const victim = new Int8Array(v);
-
-  for (let proc = 0; proc < process_count; proc++) {
-    if (
-      proc !== me &&
-      level[proc] >= waiting_room_idx &&
-      victim[waiting_room_idx] === me
-    ) {
-      return true;
-    }
-  }
-  return false;
+  const at_highest_level = every(
+    Array.from(level)
+      .filter((val, idx) => idx !== me)
+      .map((val) => val < waiting_room_idx)
+  );
+  return victim[waiting_room_idx] != me || at_highest_level;
 }
 
 async function lock(me, l, v) {
@@ -27,7 +23,7 @@ async function lock(me, l, v) {
     self.postMessage({ type: "sync_store", level, victim });
     do {
       await Yield();
-    } while (should_wait(me, i, l, v));
+    } while (!can_proceed(me, i, l, v));
   }
 }
 
