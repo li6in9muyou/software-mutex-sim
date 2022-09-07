@@ -17,11 +17,11 @@ function should_wait(who, now) {
 }
 
 export async function lock(me) {
+  console.log(me, "trys to lock", level, victim);
   for (let i = 1; i < process_count; i++) {
     level[me] = i + 1;
     victim[i] = me;
-    level_store.set(level);
-    victim_store.set(victim);
+    console.log(level, victim);
     do {
       await Yield();
     } while (should_wait(me, i));
