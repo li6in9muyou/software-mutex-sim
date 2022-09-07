@@ -1,7 +1,29 @@
 <script>
   import { onMount } from "svelte";
+  import { writable } from "svelte/store";
   const process_count = 10;
   console.info("Peterson's begins");
+
+  const victim_store = writable([]);
+  const level_store = writable([]);
+  function handleWorkerMessage(ev) {
+    const d = ev.data;
+    switch (d.type) {
+      case "sync_store": {
+        const { level, victim } = d;
+        if (level !== undefined) {
+          level_store.set(level);
+        }
+        if (victim !== undefined) {
+          victim_store.set(victim);
+        }
+        break;
+      }
+      default: {
+        console.info(d);
+      }
+    }
+  }
 
   onMount(() => {
     const l = new SharedArrayBuffer(process_count);
@@ -10,7 +32,7 @@
       const t = new Worker(new URL("./Peterson.ts", import.meta.url), {
         type: "module",
       });
-      t.onmessage = (ev) => console.info(`${i} said: ` + ev.data);
+      t.onmessage = handleWorkerMessage;
       t.onerror = (ev) => console.error(`${i} error: ` + ev.data);
       t.postMessage({
         me: i,
@@ -25,8 +47,8 @@
 <section>
   <h1>Peterson's Algorithm</h1>
   <h2>Global Memory</h2>
-  <p>level:</p>
-  <p>victim:</p>
+  <p>level: {$level_store}</p>
+  <p>victim: {$victim_store}</p>
   <h2>overview</h2>
   <p>process_status:</p>
   <p>those in critical region:</p>

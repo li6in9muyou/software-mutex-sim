@@ -19,6 +19,7 @@ async function lock(me, l, v) {
   for (let i = 1; i < process_count; i++) {
     level[me] = i;
     victim[i] = me;
+    self.postMessage({ type: "sync_store", level, victim });
     do {
       await Yield();
     } while (should_wait(me, i, l, v));
@@ -28,6 +29,7 @@ async function lock(me, l, v) {
 function unlock(me, l) {
   const level = new Int8Array(l);
   level[me] = 0;
+  self.postMessage({ type: "sync_store", level });
 }
 
 async function lock_adapter(d) {
