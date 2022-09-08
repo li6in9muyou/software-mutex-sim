@@ -71,7 +71,7 @@
           new URL("./EisenbergAndMcGuire.ts", import.meta.url),
           {
             type: "module",
-            name: `lamport's ${pid}` /* @vite-ignore */,
+            name: `eisenberg/McGuire's ${pid}` /* @vite-ignore */,
           }
         );
         w.onmessage = (d) => handleWorkerMessage(w, d);
