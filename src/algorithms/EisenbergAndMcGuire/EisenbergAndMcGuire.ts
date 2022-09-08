@@ -1,4 +1,4 @@
-import { Idle, Yield } from "../../utility";
+import { Idle } from "../../utility";
 
 const IDLE = 13;
 const IN_CS = 99;
@@ -25,10 +25,8 @@ async function lock(context, i) {
     flag[i] = WANT_IN;
     j = turn;
     self.postMessage({ type: "sync_store", flag });
-    await Yield();
 
     while (j != i) {
-      await Yield();
       if (flag[j] != IDLE) {
         j = turn;
       } else {
@@ -42,7 +40,6 @@ async function lock(context, i) {
 
     j = 0;
     while (j < process_count && (j === i || flag[j] !== IN_CS)) {
-      await Yield();
       j += 1;
     }
     if (j >= process_count && (turn == i || flag[turn] == IDLE)) {
@@ -57,7 +54,6 @@ async function unlock(context, i) {
   let { flag, turn, process_count } = extract(context);
   let pid = (turn + 1) % process_count;
   while (true) {
-    await Yield();
     pid += 1;
     pid %= process_count;
     if (flag[pid] !== IDLE) {

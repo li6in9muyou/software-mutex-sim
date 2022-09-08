@@ -1,5 +1,5 @@
 import { max } from "lodash";
-import { Idle, Yield } from "../../utility";
+import { Idle } from "../../utility";
 
 const TRUE = 99;
 const FALSE = -99;
@@ -31,9 +31,7 @@ async function lock(context, i) {
   flag[i] = TRUE;
   label[i] = max(label) + 1;
   self.postMessage({ type: "sync_store", flag, label });
-  do {
-    await Yield();
-  } while (should_wait(context, i));
+  do {} while (should_wait(context, i));
 }
 
 function unlock(context, i) {

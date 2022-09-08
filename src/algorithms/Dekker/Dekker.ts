@@ -1,4 +1,4 @@
-import { Idle, Yield } from "../../utility";
+import { Idle } from "../../utility";
 
 interface RawCtx {
   wants_to_enter: ArrayBuffer;
@@ -33,7 +33,6 @@ async function lock(context: RawCtx, id) {
       wants_to_enter[id] = FALSE;
       self.postMessage({ type: "sync_store", wants_to_enter });
       while (turn !== id) {
-        await Yield();
         // busy waiting
       }
       wants_to_enter[id] = TRUE;

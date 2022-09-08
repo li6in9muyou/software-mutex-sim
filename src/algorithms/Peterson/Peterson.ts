@@ -1,4 +1,4 @@
-import { Yield, Idle } from "../../utility";
+import { Idle } from "../../utility";
 import { every } from "lodash";
 
 const process_count = 10;
@@ -21,9 +21,7 @@ async function lock(me, l, v) {
     level[me] = i;
     victim[i] = me;
     self.postMessage({ type: "sync_store", level, victim });
-    do {
-      await Yield();
-    } while (!can_proceed(me, i, l, v));
+    do {} while (!can_proceed(me, i, l, v));
   }
 }
 
