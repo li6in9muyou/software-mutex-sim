@@ -18,19 +18,24 @@ export default abstract class Labour {
     self.close();
   }
 
-  private context_handler = {
-    set(target, property, value) {
-      target[property] = value;
-      console.log("set ", target, property, value);
-      const message = { type: "sync_store", [property]: value };
-      self.postMessage(message);
-      return true;
-    },
-    get(target, property) {
-      console.log("get ", target, property);
-      return target[property];
-    },
-  };
+  private get_hook_for(context_key) {
+    const cook = (raw) =>
+      this.prepare_context_impl({ [context_key]: raw })[context_key];
+    return {
+      set(buffer, index, value) {
+        const cooked = cook(buffer);
+        cooked[index] = value;
+        self.postMessage({
+          type: "sync_store",
+          [context_key]: cooked,
+        });
+        return true;
+      },
+      get(buffer, index) {
+        return cook(buffer)[index];
+      },
+    };
+  }
 
   async run() {
     await this.lock();
@@ -51,7 +56,14 @@ export default abstract class Labour {
   }
 
   prepare_context(context) {
-    return new Proxy(this.prepare_context_impl(context), this.context_handler);
+    const with_trap = {};
+    for (const contextKey in this.prepare_context_impl(context)) {
+      with_trap[contextKey] = new Proxy(
+        context[contextKey],
+        this.get_hook_for(contextKey)
+      );
+    }
+    return with_trap;
   }
 
   protected abstract lock_impl(context);
