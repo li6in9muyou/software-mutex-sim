@@ -1,51 +1,54 @@
 import { Idle } from "../../utility";
-import { every } from "lodash";
+import { identity } from "lodash";
+import type { IContext } from "../../Labour";
+import Labour from "../../Labour";
 
-const process_count = 10;
-
-function can_proceed(me, waiting_room_idx, l, v) {
-  const level = new Int8Array(l);
-  const victim = new Int8Array(v);
-  const at_highest_level = every(
-    Array.from(level)
-      .filter((val, idx) => idx !== me)
-      .map((val) => val < waiting_room_idx)
-  );
-  return victim[waiting_room_idx] != me || at_highest_level;
+interface IPetersonContext extends IContext {
+  level: Int8Array;
+  victim: Int8Array;
 }
 
-async function lock(me, l, v) {
-  const level = new Int8Array(l);
-  const victim = new Int8Array(v);
-  for (let i = 1; i < process_count; i++) {
-    level[me] = i;
-    victim[i] = me;
-    self.postMessage({ type: "sync_store", level, victim });
-    do {} while (!can_proceed(me, i, l, v));
+class Peterson extends Labour {
+  process_count;
+
+  constructor(who: number, context: IPetersonContext, process_count: number) {
+    super(who, context, Idle);
+    this.process_count = process_count;
+  }
+
+  can_proceed(me, waiting_room_idx, l, v) {
+    const at_highest_level = l
+      .filter((val, idx) => {
+        return idx !== me;
+      })
+      .map((val) => val < waiting_room_idx)
+      .every(identity);
+    return v[waiting_room_idx] != me || at_highest_level;
+  }
+
+  protected lock_impl(context) {
+    const { level, victim } = context;
+    for (let i = 1; i < this.process_count; i++) {
+      level[this.who] = i;
+      victim[i] = this.who;
+      do {} while (!this.can_proceed(this.who, i, level, victim));
+    }
+  }
+
+  protected prepare_context_impl(context): IPetersonContext {
+    return {
+      level: new Int8Array(context.level),
+      victim: new Int8Array(context.victim),
+    };
+  }
+
+  protected unlock_impl(context) {
+    context.level[this.who] = 0;
   }
 }
 
-function unlock(me, l) {
-  const level = new Int8Array(l);
-  level[me] = 0;
-  self.postMessage({ type: "sync_store", level });
-}
-
-async function lock_adapter(d) {
-  const { me, level: l, victim: v } = d;
-  await lock(me, l, v);
-}
-
-function unlock_adapter(d) {
-  const { me, level: l } = d;
-  unlock(me, l);
-}
-
 self.onmessage = async (ev) => {
-  await lock_adapter(ev.data);
-  self.postMessage({ type: "pre", who: ev.data.me });
-  await Idle();
-  self.postMessage({ type: "post", who: ev.data.me });
-  unlock_adapter(ev.data);
-  self.postMessage({ type: "done", who: ev.data.me });
+  const { me, level, victim, process_count = 10 } = ev.data;
+  const d = new Peterson(me, { level, victim }, process_count);
+  await d.run();
 };
