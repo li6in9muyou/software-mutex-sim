@@ -1,5 +1,5 @@
 export interface IContext {
-  [context_name: string]: SharedArrayBuffer;
+  [context_name: symbol]: SharedArrayBuffer;
 }
 
 export default abstract class Labour {
@@ -7,48 +7,54 @@ export default abstract class Labour {
   context: IContext;
   private readonly useful_function: () => void;
 
-  constructor(who: number, context: IContext, useful_function) {
+  protected constructor(who: number, context: IContext, useful_function) {
     this.who = who;
     this.useful_function = useful_function;
-    this.context = new Proxy(context, this.context_handler);
-    self.onmessage = (ev) => {
-      this.run().then(this.terminate);
-    };
+    this.context = context;
   }
 
-  private terminate() {
-    self.postMessage({ action: "done" });
+  terminate() {
+    self.postMessage({ type: "done" });
     self.close();
   }
 
   private context_handler = {
     set(target, property, value) {
       target[property] = value;
-      self.postMessage({ type: "sync_store", context: this.context });
+      console.log("set ", target, property, value);
+      const message = { type: "sync_store", [property]: value };
+      self.postMessage(message);
       return true;
     },
     get(target, property) {
+      console.log("get ", target, property);
       return target[property];
     },
   };
 
-  private async run() {
+  async run() {
     await this.lock();
     await this.useful_function();
     await this.unlock();
+    self.postMessage({ type: "done", who: this.who });
   }
 
   async lock() {
     const cooked = this.prepare_context(this.context);
     this.lock_impl(cooked);
+    self.postMessage({ type: "pre", who: this.who });
   }
 
   async unlock() {
-    const cooked = this.prepare_context(this.context);
-    this.unlock_impl(cooked);
+    self.postMessage({ type: "post", who: this.who });
+    this.unlock_impl(this.prepare_context(this.context));
+  }
+
+  prepare_context(context) {
+    return new Proxy(this.prepare_context_impl(context), this.context_handler);
   }
 
   protected abstract lock_impl(context);
   protected abstract unlock_impl(context);
-  protected abstract prepare_context(context): IContext;
+  protected abstract prepare_context_impl(context): IContext;
 }
