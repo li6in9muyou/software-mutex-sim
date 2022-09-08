@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
   import { SveltePort } from "../../SveltePort";
+  import { Yield } from "../../utility";
   const process_count = 10;
   console.info("Peterson's begins");
 
@@ -11,9 +12,10 @@
   const in_region = port.those_in_critical_region;
   const contending = port.those_contending;
   const overview = port.process_status;
+  let killed_process_count = 0;
   const workers = [];
 
-  function handleWorkerMessage(ev) {
+  function handleWorkerMessage(worker, ev) {
     const d = ev.data;
     switch (d.type) {
       case "pre": {
@@ -27,6 +29,7 @@
       case "done": {
         workers[d.who].terminate();
         console.log(`${d.who} is killed`);
+        killed_process_count += 1;
         break;
       }
       case "sync_store": {
@@ -45,23 +48,30 @@
     }
   }
 
-  onMount(() => {
-    const l = new SharedArrayBuffer(process_count);
-    const v = new SharedArrayBuffer(process_count);
-    for (let i = 0; i < process_count; i++) {
-      const t = new Worker(new URL("./Peterson.ts", import.meta.url), {
-        type: "module",
-      });
-      t.onmessage = handleWorkerMessage;
-      t.onerror = (ev) => console.error(`${i} error: ` + ev.data);
-      workers[i] = t;
-      t.postMessage({
-        me: i,
-        level: l,
-        victim: v,
-      });
+  onMount(async () => {
+    while (true) {
+      const l = new SharedArrayBuffer(process_count);
+      const v = new SharedArrayBuffer(process_count);
+      killed_process_count = 0;
+      for (let i = 0; i < process_count; i++) {
+        const t = new Worker(new URL("./Peterson.ts", import.meta.url), {
+          type: "module",
+          name: `peterson's ${i}` /* @vite-ignore */,
+        });
+        t.onmessage = (d) => handleWorkerMessage(t, d);
+        t.onerror = (ev) => console.error(`${i} error: ` + ev.data);
+        workers[i] = t;
+        t.postMessage({
+          me: i,
+          level: l,
+          victim: v,
+        });
+      }
+      console.log("done spawning");
+      do {
+        await Yield();
+      } while (killed_process_count !== process_count);
     }
-    console.log("done spawning");
   });
 </script>
 
