@@ -1,3 +1,5 @@
+import { isFunction } from "lodash";
+
 export interface IContext {
   [context_name: symbol]: SharedArrayBuffer;
 }
@@ -32,7 +34,13 @@ export default abstract class Labour {
         return true;
       },
       get(buffer, index) {
-        return cook(buffer)[index];
+        const cooked = cook(buffer);
+        const meat = cooked[index];
+        if (isFunction(meat)) {
+          return meat.bind(cooked);
+        } else {
+          return meat;
+        }
       },
     };
   }
