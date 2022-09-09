@@ -1,82 +1,33 @@
 <script>
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
-  import { SveltePort } from "../../SveltePort";
-  import { Yield } from "../../utility";
-  const process_count = 10;
-  console.info("Lamport's begins");
+  import { RunAndSync } from "../../use_case/RunAndSync";
+  import {
+    build_init_context,
+    build_worker,
+    sync_memory_to_store,
+  } from "./Lamport";
 
+  const process_count = 10;
   const flag_store = writable([]);
   const label_store = writable([]);
-  const port = new SveltePort(process_count);
+
+  const demo = new RunAndSync(
+    process_count,
+    { flag: flag_store, label: label_store },
+    build_worker,
+    () => build_init_context(process_count),
+    (ctx) => sync_memory_to_store(flag_store, label_store, ctx)
+  );
+
+  const port = demo.port;
   const in_region = port.those_in_critical_region;
   const contending = port.those_contending;
   const overview = port.process_status;
-  let killed_process_count = 0;
-  const workers = [];
-
-  function handleWorkerMessage(worker, ev) {
-    const d = ev.data;
-    switch (d.type) {
-      case "pre": {
-        port.pre_critical_region(d.who);
-        break;
-      }
-      case "post": {
-        port.post_critical_region(d.who);
-        break;
-      }
-      case "done": {
-        workers[d.who].terminate();
-        console.log(`${d.who} is killed`);
-        killed_process_count += 1;
-        break;
-      }
-      case "sync_store": {
-        const { flag, label } = d;
-        let updated = false;
-        if (flag !== undefined) {
-          flag_store.set(Array.from(flag).map((v) => v === 99));
-          updated = true;
-        }
-        if (label !== undefined) {
-          label_store.set(label);
-          updated = true;
-        }
-        if (!updated) {
-          console.warn(`not updated: ${flag} ${label}`);
-        }
-        break;
-      }
-      default: {
-        console.info(d);
-      }
-    }
-  }
 
   onMount(async () => {
-    while (true) {
-      const f = new SharedArrayBuffer(process_count);
-      const l = new SharedArrayBuffer(process_count);
-      killed_process_count = 0;
-      for (let i = 0; i < process_count; i++) {
-        const t = new Worker(new URL("./Lamport.ts", import.meta.url), {
-          type: "module",
-          name: `lamport's ${i}` /* @vite-ignore */,
-        });
-        t.onmessage = (d) => handleWorkerMessage(t, d);
-        t.onerror = (ev) => console.error(`${i} error: ` + ev.data);
-        workers[i] = t;
-        t.postMessage({
-          me: i,
-          context: { flag: f, label: l },
-        });
-      }
-      console.log("done spawning");
-      do {
-        await Yield();
-      } while (killed_process_count < process_count);
-    }
+    console.info("Lamport's begins");
+    await demo.start();
   });
 </script>
 

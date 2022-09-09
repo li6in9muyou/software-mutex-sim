@@ -1,7 +1,30 @@
-import { max } from "lodash";
+import { isUndefined, max } from "lodash";
 import { Idle } from "../../utility";
 import Labour from "../../Labour";
 import type { IContext } from "../../Labour";
+
+export function build_worker() {
+  return new Worker(new URL("./Lamport.ts", import.meta.url), {
+    type: "module",
+  });
+}
+
+export function build_init_context(process_count) {
+  return {
+    flag: new SharedArrayBuffer(process_count),
+    label: new SharedArrayBuffer(process_count),
+  };
+}
+
+export function sync_memory_to_store(flag_store, label_store, context) {
+  const { flag, label } = context;
+  if (!isUndefined(flag)) {
+    flag_store.set(Array.from(flag).map((v) => v === Lamport.TRUE));
+  }
+  if (!isUndefined(label)) {
+    label_store.set(label);
+  }
+}
 
 interface ILamportMemory extends IContext {
   flag: Int8Array;
