@@ -1,92 +1,33 @@
 <script>
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
-  import { SveltePort } from "../../SveltePort";
-  import { Yield } from "../../utility";
-  import { range, shuffle } from "lodash";
-  const process_count = 13;
-  console.info("Lamport's begins");
+  import { RunAndSync } from "../../use_case/RunAndSync";
+  import {
+    build_init_context,
+    build_worker,
+    sync_memory_to_store,
+  } from "./EisenbergAndMcGuire";
 
+  const process_count = 13;
   const flag_store = writable([]);
-  const turn_store = writable([]);
-  const port = new SveltePort(process_count);
+  const turn_store = writable(0);
+
+  const demo = new RunAndSync(
+    process_count,
+    { flag: flag_store, turn: turn_store },
+    build_worker,
+    () => build_init_context(process_count),
+    (ctx) => sync_memory_to_store(flag_store, turn_store, ctx)
+  );
+
+  const port = demo.port;
   const in_region = port.those_in_critical_region;
   const contending = port.those_contending;
   const overview = port.process_status;
-  let killed_process_count = 0;
-  const workers = [];
-
-  function handleWorkerMessage(worker, ev) {
-    const d = ev.data;
-    switch (d.type) {
-      case "pre": {
-        port.pre_critical_region(d.who);
-        break;
-      }
-      case "post": {
-        port.post_critical_region(d.who);
-        break;
-      }
-      case "done": {
-        workers[d.who].terminate();
-        console.log(`${d.who} is killed`);
-        killed_process_count += 1;
-        break;
-      }
-      case "sync_store": {
-        const { flag, turn } = d;
-        let updated = false;
-        if (flag !== undefined) {
-          flag_store.set(
-            Array.from(flag).map(
-              (v) => ({ 99: "in-cs", 13: "idle", 42: "want-in" }[v])
-            )
-          );
-          updated = true;
-        }
-        if (turn !== undefined) {
-          turn_store.set(turn);
-          updated = true;
-        }
-        if (!updated) {
-          console.warn(`not updated: ${flag} ${turn}`);
-        }
-        break;
-      }
-      default: {
-        console.info(d);
-        break;
-      }
-    }
-  }
 
   onMount(async () => {
-    while (true) {
-      const f = new SharedArrayBuffer(process_count);
-      const t = new SharedArrayBuffer(1);
-      killed_process_count = 0;
-
-      for (const pid of shuffle(range(0, process_count))) {
-        const w = new Worker(
-          new URL("./EisenbergAndMcGuire.ts", import.meta.url),
-          {
-            type: "module",
-            name: `eisenberg/McGuire's ${pid}` /* @vite-ignore */,
-          }
-        );
-        w.onmessage = (d) => handleWorkerMessage(w, d);
-        w.onerror = (ev) => console.error(`${pid} error: ` + ev.data);
-        workers[pid] = w;
-        w.postMessage({
-          me: pid,
-          context: { flag: f, turn: t, process_count },
-        });
-      }
-      console.log("done spawning");
-      do {
-        await Yield();
-      } while (killed_process_count < process_count);
-    }
+    console.info("Lamport's begins");
+    await demo.start();
   });
 </script>
 

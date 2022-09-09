@@ -6,6 +6,36 @@ const IDLE = 13;
 const IN_CS = 99;
 const WANT_IN = 42;
 
+export function build_worker() {
+  return new Worker(new URL("./EisenbergAndMcGuire.ts", import.meta.url), {
+    type: "module",
+  });
+}
+
+export function build_init_context(process_count) {
+  const buffer = new SharedArrayBuffer(process_count);
+  return {
+    flag: new Int8Array(buffer).fill(process_count).buffer,
+    turn: new SharedArrayBuffer(1),
+    process_count,
+  };
+}
+
+export function sync_memory_to_store(flag_store, turn_store, context) {
+  const { flag, turn } = context;
+  if (flag !== undefined) {
+    flag_store.set(
+      Array.from(flag).map(
+        (v: number) =>
+          ({ [IN_CS]: "in-cs", [IDLE]: "idle", [WANT_IN]: "want-in" }[v])
+      )
+    );
+  }
+  if (turn !== undefined) {
+    turn_store.set(turn[0]);
+  }
+}
+
 interface IEisenbergAndMcGuireMemory extends IContext {
   flag: Int8Array;
   turn: Int8Array;
