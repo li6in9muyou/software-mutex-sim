@@ -16,7 +16,7 @@ class Peterson extends Labour {
     this.process_count = process_count;
   }
 
-  can_proceed(me, waiting_room_idx, l, v) {
+  private can_proceed(me, waiting_room_idx, l, v) {
     const at_highest_level = l
       .filter((val, idx) => {
         return idx !== me;
