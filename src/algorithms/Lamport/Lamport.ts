@@ -1,51 +1,53 @@
 import { max } from "lodash";
 import { Idle } from "../../utility";
+import Labour from "../../Labour";
+import type { IContext } from "../../Labour";
 
-const TRUE = 99;
-const FALSE = -99;
-
-interface Context {
+interface ILamportMemory extends IContext {
   flag: Int8Array;
   label: Int8Array;
 }
 
-function extract(context): Context {
-  return {
-    flag: new Int8Array(context.flag),
-    label: new Int8Array(context.label),
-  };
-}
+class Lamport extends Labour {
+  static TRUE = 99;
+  static FALSE = -99;
 
-function should_wait(context: Context, i: number): boolean {
-  const { label, flag } = extract(context);
-  return Array.from(label)
-    .map((ticket, idx) => [ticket, idx])
-    .filter(([, pid]) => pid !== i)
-    .filter(([, pid]) => flag[pid] === TRUE)
-    .map(([ticket, pid]) => (ticket === label[i] ? pid < i : ticket < label[i]))
-    .some((i) => i);
-}
+  constructor(who: number, context: IContext) {
+    super(who, context, Idle);
+  }
 
-async function lock(context, i) {
-  const { flag, label } = extract(context);
-  flag[i] = TRUE;
-  label[i] = max(label) + 1;
-  self.postMessage({ type: "sync_store", flag, label });
-  do {} while (should_wait(context, i));
-}
+  private should_wait(context: ILamportMemory): boolean {
+    const { label, flag } = context;
+    return Array.from(label)
+      .map((ticket, idx) => [ticket, idx])
+      .filter(([, pid]) => pid !== this.who)
+      .filter(([, pid]) => flag[pid] === Lamport.TRUE)
+      .map(([ticket, pid]) =>
+        ticket === label[this.who] ? pid < this.who : ticket < label[this.who]
+      )
+      .some((i) => i);
+  }
 
-function unlock(context, i) {
-  const { flag } = extract(context);
-  flag[i] = FALSE;
-  self.postMessage({ type: "sync_store", flag });
+  protected lock_impl(context: ILamportMemory) {
+    const { flag, label } = context;
+    flag[this.who] = Lamport.TRUE;
+    label[this.who] = max(label) + 1;
+    do {} while (this.should_wait(context));
+  }
+
+  protected prepare_context_impl(context): ILamportMemory {
+    return {
+      flag: new Int8Array(context.flag),
+      label: new Int8Array(context.label),
+    };
+  }
+
+  protected unlock_impl(context) {
+    context.flag[this.who] = Lamport.FALSE;
+  }
 }
 
 self.onmessage = async (ev) => {
   const { me, context } = ev.data;
-  await lock(context, me);
-  self.postMessage({ type: "pre", who: ev.data.me });
-  await Idle();
-  self.postMessage({ type: "post", who: ev.data.me });
-  unlock(context, me);
-  self.postMessage({ type: "done", who: ev.data.me });
+  await new Lamport(me, context).run();
 };
