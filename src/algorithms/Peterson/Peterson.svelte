@@ -1,77 +1,33 @@
 <script>
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
-  import { SveltePort } from "../../SveltePort";
-  import { Yield } from "../../utility";
-  const process_count = 10;
-  console.info("Peterson's begins");
+  import { RunAndSync } from "../../use_case/RunAndSync";
+  import {
+    build_init_context,
+    build_worker,
+    sync_memory_to_store,
+  } from "./Peterson";
 
-  const victim_store = writable([]);
+  const process_count = 10;
   const level_store = writable([]);
-  const port = new SveltePort(process_count);
+  const victim_store = writable([]);
+
+  const demo = new RunAndSync(
+    process_count,
+    { level: level_store, victim: victim_store },
+    build_worker,
+    () => build_init_context(process_count),
+    (ctx) => sync_memory_to_store(level_store, victim_store, ctx)
+  );
+
+  const port = demo.port;
   const in_region = port.those_in_critical_region;
   const contending = port.those_contending;
   const overview = port.process_status;
-  let killed_process_count = 0;
-  const workers = [];
-
-  function handleWorkerMessage(worker, ev) {
-    const d = ev.data;
-    switch (d.type) {
-      case "pre": {
-        port.pre_critical_region(d.who);
-        break;
-      }
-      case "post": {
-        port.post_critical_region(d.who);
-        break;
-      }
-      case "done": {
-        workers[d.who].terminate();
-        console.log(`${d.who} is killed`);
-        killed_process_count += 1;
-        break;
-      }
-      case "sync_store": {
-        const { level, victim } = d;
-        if (level !== undefined) {
-          level_store.set(level);
-        }
-        if (victim !== undefined) {
-          victim_store.set(victim);
-        }
-        break;
-      }
-      default: {
-        console.info(d);
-      }
-    }
-  }
 
   onMount(async () => {
-    while (true) {
-      const l = new SharedArrayBuffer(process_count);
-      const v = new SharedArrayBuffer(process_count);
-      killed_process_count = 0;
-      for (let i = 0; i < process_count; i++) {
-        const t = new Worker(new URL("./Peterson.ts", import.meta.url), {
-          type: "module",
-          name: `peterson's ${i}` /* @vite-ignore */,
-        });
-        t.onmessage = (d) => handleWorkerMessage(t, d);
-        t.onerror = (ev) => console.error(`${i} error: ` + ev.data);
-        workers[i] = t;
-        t.postMessage({
-          me: i,
-          level: l,
-          victim: v,
-        });
-      }
-      console.log("done spawning");
-      do {
-        await Yield();
-      } while (killed_process_count !== process_count);
-    }
+    console.info("Peterson's begins");
+    await demo.start();
   });
 </script>
 

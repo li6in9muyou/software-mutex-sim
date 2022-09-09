@@ -1,7 +1,31 @@
 import { Idle } from "../../utility";
-import { identity } from "lodash";
+import { identity, isUndefined } from "lodash";
 import type { IContext } from "../../Labour";
 import Labour from "../../Labour";
+
+export function build_worker() {
+  return new Worker(new URL("./Peterson.ts", import.meta.url), {
+    type: "module",
+  });
+}
+
+export function build_init_context(process_count) {
+  return {
+    level: new SharedArrayBuffer(process_count),
+    victim: new SharedArrayBuffer(process_count),
+    process_count,
+  };
+}
+
+export function sync_memory_to_store(level_store, victim_store, context) {
+  const { level, victim } = context;
+  if (!isUndefined(level)) {
+    level_store.set(level);
+  }
+  if (!isUndefined(victim)) {
+    victim_store.set(victim);
+  }
+}
 
 interface IPetersonContext extends IContext {
   level: Int8Array;
@@ -48,7 +72,6 @@ class Peterson extends Labour {
 }
 
 self.onmessage = async (ev) => {
-  const { me, level, victim, process_count = 10 } = ev.data;
-  const d = new Peterson(me, { level, victim }, process_count);
-  await d.run();
+  const { me, context } = ev.data;
+  await new Peterson(me, context, context.process_count).run();
 };
