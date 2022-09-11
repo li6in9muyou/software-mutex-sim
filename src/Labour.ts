@@ -4,6 +4,10 @@ export interface IContext {
   [context_name: symbol]: SharedArrayBuffer;
 }
 
+export interface IWhoContextCtor {
+  simpleBuild(pid: number, context: any): Labour;
+}
+
 export default abstract class Labour {
   who: number;
   context: IContext;
@@ -79,9 +83,9 @@ export default abstract class Labour {
   protected abstract prepare_context_impl(context): IContext;
 }
 
-export function build_thread_pool_task(klass) {
+export function build_thread_pool_task(klass: IWhoContextCtor) {
   return async (data) => {
     const { me, context } = data;
-    await new klass(me, context).run();
+    await klass.simpleBuild(me, context).run();
   };
 }

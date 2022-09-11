@@ -1,6 +1,6 @@
 import { Idle } from "../../utility";
-import { identity, isUndefined } from "lodash";
-import type { IContext } from "../../Labour";
+import { identity, isUndefined, pick } from "lodash";
+import type { IWhoContextCtor, IContext } from "../../Labour";
 import Labour from "../../Labour";
 
 export function build_worker() {
@@ -35,9 +35,9 @@ interface IPetersonContext extends IContext {
 export class Peterson extends Labour {
   process_count;
 
-  constructor(who: number, context: IPetersonContext) {
+  constructor(who: number, context: IPetersonContext, process_count: number) {
     super(who, context, Idle);
-    this.process_count = context.process_count;
+    this.process_count = process_count;
   }
 
   private can_proceed(me, waiting_room_idx, l, v) {
@@ -68,5 +68,15 @@ export class Peterson extends Labour {
 
   protected unlock_impl(context) {
     context.level[this.who] = 0;
+  }
+}
+
+export class PetersonSimpleBuilder implements IWhoContextCtor {
+  simpleBuild(pid: number, context: any): Labour {
+    return new Peterson(
+      pid,
+      pick(context, ["level", "victim"]),
+      context.process_count
+    );
   }
 }

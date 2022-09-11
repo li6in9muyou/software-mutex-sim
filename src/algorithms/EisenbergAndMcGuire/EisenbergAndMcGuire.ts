@@ -1,6 +1,7 @@
 import { Idle } from "../../utility";
+import type { IContext, IWhoContextCtor } from "../../Labour";
 import Labour from "../../Labour";
-import type { IContext } from "../../Labour";
+import { pick } from "lodash";
 
 const IDLE = 13;
 const IN_CS = 99;
@@ -100,5 +101,15 @@ export class EisenbergAndMcGuire extends Labour {
     }
     turn[0] = pid;
     flag[this.who] = IDLE;
+  }
+}
+
+export class EisenbergAndMcGuireSimpleBuilder implements IWhoContextCtor {
+  simpleBuild(pid: number, context: any): Labour {
+    return new EisenbergAndMcGuire(
+      pid,
+      context.process_count,
+      pick(context, ["flag", "turn"])
+    );
   }
 }
