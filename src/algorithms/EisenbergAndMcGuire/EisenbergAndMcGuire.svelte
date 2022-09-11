@@ -26,7 +26,7 @@
   const overview = port.process_status;
 
   onMount(async () => {
-    console.info("Lamport's begins");
+    console.info("EisenbergAndMcGuire's begins");
     await demo.start();
   });
 </script>
