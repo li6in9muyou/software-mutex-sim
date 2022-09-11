@@ -24,6 +24,19 @@ type MemoryStore<T> = {
   [context_name in keyof T]: Memory;
 };
 
+class Counter {
+  num: number = 0;
+  plus() {
+    this.num += 1;
+  }
+  minus() {
+    this.num -= 1;
+  }
+  good() {
+    return this.num === 1 || this.num === 0;
+  }
+}
+
 export class RunAndSync<IMemory> {
   port: SveltePort;
   private readonly process_count: number;
@@ -32,6 +45,7 @@ export class RunAndSync<IMemory> {
   private readonly memory_store: MemoryStore<IMemory>;
   private readonly on_sync_store: (IMemory) => void;
   private readonly iteration_count: number;
+  private mutex_watchdog: Counter;
 
   constructor(
     process_count: number,
@@ -48,6 +62,7 @@ export class RunAndSync<IMemory> {
     this.build_init_context = build_init_context;
     this.on_sync_store = on_sync_store;
     this.iteration_count = iteration_count;
+    this.mutex_watchdog = new Counter();
   }
 
   private handlePoolWorkerMessage(ev) {
@@ -78,14 +93,20 @@ export class RunAndSync<IMemory> {
   }
 
   private handleLabourMessage(d) {
+    console.assert(
+      this.mutex_watchdog.good(),
+      "multiple processes in critical region!"
+    );
     const port = this.port;
     switch (d.type) {
       case "pre": {
         port.pre_critical_region(d.who);
+        this.mutex_watchdog.plus();
         break;
       }
       case "post": {
         port.post_critical_region(d.who);
+        this.mutex_watchdog.minus();
         break;
       }
       case "done": {
@@ -125,9 +146,9 @@ export class RunAndSync<IMemory> {
         });
       }
       console.log("done spawning");
+      await exec_pool.completed();
+      console.log("pool completed");
     }
-    await exec_pool.completed();
-    console.log("pool completed");
     await exec_pool.terminate();
     console.log("pool terminated");
   }
