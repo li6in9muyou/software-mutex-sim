@@ -4,7 +4,7 @@ import Labour from "../../Labour";
 import { isUndefined } from "lodash";
 
 export function build_worker() {
-  return new Worker(new URL("./Dekker.ts", import.meta.url), {
+  return new Worker(new URL("./helper.ts", import.meta.url), {
     type: "module",
   });
 }
@@ -37,7 +37,7 @@ interface IDekkerContext extends IContext {
   turn: ArrayBuffer;
 }
 
-class Dekker extends Labour {
+export class Dekker extends Labour {
   static TRUE = 99;
   static FALSE = -99;
 
@@ -75,8 +75,3 @@ class Dekker extends Labour {
     context.wants_to_enter[this.who] = Dekker.FALSE;
   }
 }
-
-self.onmessage = async (ev) => {
-  const { me, context } = ev.data;
-  await new Dekker(me, context).run();
-};

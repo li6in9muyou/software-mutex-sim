@@ -4,7 +4,7 @@ import type { IContext } from "../../Labour";
 import Labour from "../../Labour";
 
 export function build_worker() {
-  return new Worker(new URL("./Peterson.ts", import.meta.url), {
+  return new Worker(new URL("./helper.ts", import.meta.url), {
     type: "module",
   });
 }
@@ -32,12 +32,12 @@ interface IPetersonContext extends IContext {
   victim: Int8Array;
 }
 
-class Peterson extends Labour {
+export class Peterson extends Labour {
   process_count;
 
-  constructor(who: number, context: IPetersonContext, process_count: number) {
+  constructor(who: number, context: IPetersonContext) {
     super(who, context, Idle);
-    this.process_count = process_count;
+    this.process_count = context.process_count;
   }
 
   private can_proceed(me, waiting_room_idx, l, v) {
@@ -70,8 +70,3 @@ class Peterson extends Labour {
     context.level[this.who] = 0;
   }
 }
-
-self.onmessage = async (ev) => {
-  const { me, context } = ev.data;
-  await new Peterson(me, context, context.process_count).run();
-};

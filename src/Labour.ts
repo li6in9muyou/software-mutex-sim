@@ -78,3 +78,10 @@ export default abstract class Labour {
   protected abstract unlock_impl(context);
   protected abstract prepare_context_impl(context): IContext;
 }
+
+export function build_thread_pool_task(klass) {
+  return async (data) => {
+    const { me, context } = data;
+    await new klass(me, context).run();
+  };
+}

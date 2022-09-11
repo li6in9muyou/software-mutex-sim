@@ -1,8 +1,7 @@
 import type { Writable } from "svelte/store";
-import type Labour from "../Labour";
 import { SveltePort } from "../SveltePort";
 import { range, shuffle } from "lodash";
-import { Yield } from "../utility";
+import { spawn, Pool, Thread } from "threads";
 
 type TypedArray =
   | Int8Array
@@ -27,20 +26,20 @@ type MemoryStore<T> = {
 
 export class RunAndSync<IMemory> {
   port: SveltePort;
-  private killed_process_count: number;
-  private workers: Worker[];
   private readonly process_count: number;
   private readonly build_worker: () => Worker;
   private readonly build_init_context: () => IMemory;
   private readonly memory_store: MemoryStore<IMemory>;
   private readonly on_sync_store: (IMemory) => void;
+  private readonly iteration_count: number;
 
   constructor(
     process_count: number,
     memory_store: MemoryStore<IMemory>,
     build_worker: () => Worker,
     build_init_context: () => IMemory,
-    on_sync_store: (IMemory) => void
+    on_sync_store: (IMemory) => void,
+    iteration_count = 10
   ) {
     this.process_count = process_count;
     this.port = new SveltePort(process_count);
@@ -48,67 +47,88 @@ export class RunAndSync<IMemory> {
     this.build_worker = build_worker;
     this.build_init_context = build_init_context;
     this.on_sync_store = on_sync_store;
+    this.iteration_count = iteration_count;
   }
 
-  private buildHandleWorkerMessage(pid: number) {
-    return (ev) => {
-      const port = this.port;
-      const workers = this.workers;
-
-      const d = ev.data;
-      switch (d.type) {
-        case "pre": {
-          port.pre_critical_region(d.who);
-          break;
+  private handlePoolWorkerMessage(ev) {
+    switch (ev.type) {
+      case "message": {
+        switch (ev.data.type) {
+          case "result":
+          case "running": {
+            console.log("worker: ", ev.data);
+            break;
+          }
+          default: {
+            this.handleLabourMessage(ev.data);
+            break;
+          }
         }
-        case "post": {
-          port.post_critical_region(d.who);
-          break;
-        }
-        case "done": {
-          workers[d.who].terminate();
-          console.log(`${d.who} is killed`);
-          this.killed_process_count += 1;
-          break;
-        }
-        case "sync_store": {
-          this.on_sync_store(d);
-          break;
-        }
-        default: {
-          console.info(d);
-          break;
-        }
+        break;
       }
-    };
+      case "termination": {
+        console.log("one worker exited");
+        break;
+      }
+      default: {
+        console.warn("unknown worker msg: ", ev);
+        break;
+      }
+    }
+  }
+
+  private handleLabourMessage(d) {
+    const port = this.port;
+    switch (d.type) {
+      case "pre": {
+        port.pre_critical_region(d.who);
+        break;
+      }
+      case "post": {
+        port.post_critical_region(d.who);
+        break;
+      }
+      case "done": {
+        console.log(`process ${d.who} completes one iteration`);
+        break;
+      }
+      case "sync_store": {
+        this.on_sync_store(d);
+        break;
+      }
+      default: {
+        console.info(d);
+        break;
+      }
+    }
   }
 
   async start() {
     const process_count = this.process_count;
 
-    while (true) {
-      const workers = new Array(process_count)
-        .fill(null)
-        .map(this.build_worker);
-      this.workers = workers;
-      const context = this.build_init_context();
+    const exec_pool = Pool(
+      () =>
+        spawn(this.build_worker()).then((thread) => {
+          Thread.events(thread).subscribe(
+            this.handlePoolWorkerMessage.bind(this)
+          );
+          return thread;
+        }),
+      { size: 2 }
+    );
 
-      this.killed_process_count = 0;
+    for (let i = 0; i < this.iteration_count; i += 1) {
+      const context = this.build_init_context();
       for (const pid of shuffle(range(0, process_count))) {
-        const w = workers[pid];
-        w.onmessage = this.buildHandleWorkerMessage(pid);
-        w.onerror = (ev) =>
-          console.error(`${pid} error: ` + JSON.stringify(ev));
-        w.postMessage({
-          me: pid,
-          context,
+        exec_pool.queue(async (w) => {
+          await w({ me: pid, context });
         });
       }
-
       console.log("done spawning");
-      do {
-        await Yield();
-      } while (this.killed_process_count < process_count);
     }
+    await exec_pool.completed();
+    console.log("pool completed");
+    await exec_pool.terminate();
+    console.log("pool terminated");
   }
 }

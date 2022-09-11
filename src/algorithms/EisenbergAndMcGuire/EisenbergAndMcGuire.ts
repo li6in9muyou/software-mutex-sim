@@ -7,7 +7,7 @@ const IN_CS = 99;
 const WANT_IN = 42;
 
 export function build_worker() {
-  return new Worker(new URL("./EisenbergAndMcGuire.ts", import.meta.url), {
+  return new Worker(new URL("./helper.ts", import.meta.url), {
     type: "module",
   });
 }
@@ -41,7 +41,7 @@ interface IEisenbergAndMcGuireMemory extends IContext {
   turn: Int8Array;
 }
 
-class EisenbergAndMcGuire extends Labour {
+export class EisenbergAndMcGuire extends Labour {
   private readonly process_count: number;
 
   constructor(who: number, process_count: number, context: IContext) {
@@ -102,8 +102,3 @@ class EisenbergAndMcGuire extends Labour {
     flag[this.who] = IDLE;
   }
 }
-
-self.onmessage = async (ev) => {
-  const { me, context } = ev.data;
-  await new EisenbergAndMcGuire(me, context.process_count, context).run();
-};

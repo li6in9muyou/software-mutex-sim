@@ -4,7 +4,7 @@ import Labour from "../../Labour";
 import type { IContext } from "../../Labour";
 
 export function build_worker() {
-  return new Worker(new URL("./Lamport.ts", import.meta.url), {
+  return new Worker(new URL("./helper.ts", import.meta.url), {
     type: "module",
   });
 }
@@ -31,7 +31,7 @@ interface ILamportMemory extends IContext {
   label: Int8Array;
 }
 
-class Lamport extends Labour {
+export class Lamport extends Labour {
   static TRUE = 99;
   static FALSE = -99;
 
@@ -69,8 +69,3 @@ class Lamport extends Labour {
     context.flag[this.who] = Lamport.FALSE;
   }
 }
-
-self.onmessage = async (ev) => {
-  const { me, context } = ev.data;
-  await new Lamport(me, context).run();
-};
