@@ -7,16 +7,16 @@
   );
 </script>
 
-<div class="navbar bg-base-200 mb-2 shadow-xl rounded">
+<div class="navbar mb-2 rounded bg-base-200 shadow-xl">
   <div class="navbar-start">
-    <a class="btn btn-ghost normal-case text-xl">MutexSim</a>
+    <a class="btn btn-ghost text-xl normal-case">MutexSim</a>
   </div>
   <div class="navbar-end"><a class="btn">next</a></div>
 </div>
 
 <main class="p-4">
   <label class="label">
-    <span class="label-text text-2xl underline mb-4">Choose an algorithm</span>
+    <span class="label-text mb-4 text-2xl underline">Choose an algorithm</span>
   </label>
   <select class="select select-primary w-full max-w-xs" bind:value={selected}>
     <option disabled selected>Pick one</option>

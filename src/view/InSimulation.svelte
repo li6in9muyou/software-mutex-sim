@@ -32,7 +32,7 @@
   }
 </script>
 
-<div class="navbar bg-base-200 mb-2 shadow-xl rounded">
+<div class="navbar mb-2 rounded bg-base-200 shadow-xl">
   <div class="navbar-start">
     <a class="btn">back</a>
   </div>
@@ -50,14 +50,14 @@
   </div>
 </div>
 
-<main class="mt-4 flex flex-col max-h-[90vh]">
+<main class="mt-4 flex max-h-[90vh] flex-col">
   <section>
-    <h2 class="text-2xl underline mb-2">inspect one process</h2>
-    <div class="flex flex-col max-h-64 overflow-y-auto gap-3">
+    <h2 class="mb-2 text-2xl underline">inspect one process</h2>
+    <div class="flex max-h-64 flex-col gap-3 overflow-y-auto">
       {#each range(0, 10) as pid}
         <div
           class:bg-primary={pid === selectedPid}
-          class="bg-base-100 rounded p-4 border border-primary flex"
+          class="flex rounded border border-primary bg-base-100 p-4"
           on:click={() => (selectedPid = pid)}
         >
           <div>
@@ -72,7 +72,7 @@
           >
             {#if showPauseSpinner}
               <svg
-                class="animate-spin -ml-1 mr-3 h-5 w-5 text-error"
+                class="-ml-1 mr-3 h-5 w-5 animate-spin text-error"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -106,22 +106,22 @@
   </section>
   <div class="divider my-0" />
   <section>
-    <h2 class="text-2xl underline mb-2">source code</h2>
+    <h2 class="mb-2 text-2xl underline">source code</h2>
     <ol
-      class="flex flex-col max-h-64 overflow-y-auto bg-base-300 text-primary-content rounded"
+      class="flex max-h-64 flex-col overflow-y-auto rounded bg-base-300 text-primary-content"
     >
       {#each range(0, 7) as lineno}
         {#if lineno === $currentLineno}
           <li class="indicator ml-4">
             <span
-              class="indicator-item indicator-middle indicator-start badge badge-sm badge-secondary"
+              class="badge indicator-item badge-secondary badge-sm indicator-start indicator-middle"
             />
             <div class="px-4">
               {`${lineno} one two three four five`}
             </div>
           </li>
         {:else}
-          <div class="px-3 transition-all duration-300 ml-4">
+          <div class="ml-4 px-3 transition-all duration-300">
             {`${lineno} one two three four five`}
           </div>
         {/if}
@@ -129,14 +129,14 @@
     </ol>
   </section>
   <div class="divider my-0" />
-  <section class="flex flex-col gap-2 flex-grow">
-    <h2 class="text-2xl underline mb-2">shard memory</h2>
+  <section class="flex flex-grow flex-col gap-2">
+    <h2 class="mb-2 text-2xl underline">shard memory</h2>
     <div>
-      <div class="text-xl mb-2">level</div>
-      <div class="flex gap-1 w-full mb-3">
+      <div class="mb-2 text-xl">level</div>
+      <div class="mb-3 flex w-full gap-1">
         {#each range(-5, 5) as idx}
           <div
-            class="border border-secondary flex-1 flex justify-center text-xl"
+            class="flex flex-1 justify-center border border-secondary text-xl"
           >
             {(idx + 1) * (idx + 1)}
           </div>
@@ -144,7 +144,7 @@
       </div>
     </div>
     <div>
-      <div class="text-xl mb-2">turn</div>
+      <div class="mb-2 text-xl">turn</div>
       <div class="text-2xl">{turn}</div>
     </div>
   </section>
