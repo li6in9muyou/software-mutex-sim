@@ -70,7 +70,7 @@
             class="btn btn-sm ml-auto"
             on:click={() => toggle_process_running(pid)}
           >
-            {#if showPauseSpinner}
+            {#if showPauseSpinner && pid === selectedPid}
               <svg
                 class="-ml-1 mr-3 h-5 w-5 animate-spin text-error"
                 xmlns="http://www.w3.org/2000/svg"
