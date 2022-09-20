@@ -6,18 +6,16 @@ import {
 } from "../../use_case/BaseProcess";
 import { Idle } from "../../utility";
 import { max } from "lodash";
+import { FALSE, TRUE } from "./constants";
 
-const TRUE = 99;
-const FALSE = -99;
-
-function should_wait(pid: number, ...memory: Int32Array[]): boolean {
+function should_wait(who: number, ...memory: Int32Array[]): boolean {
   const [label, flag] = memory;
   return Array.from(label)
     .map((ticket, idx) => [ticket, idx])
-    .filter(([, pid]) => pid !== pid)
+    .filter(([, pid]) => pid !== who)
     .filter(([, pid]) => flag[pid] === TRUE)
     .map(([ticket, pid]) =>
-      ticket === label[pid] ? pid < pid : ticket < label[pid]
+      ticket === label[who] ? pid < who : ticket < label[who]
     )
     .some((i) => i);
 }
@@ -28,6 +26,7 @@ async function lock(use_msg, pid, memory, process_count) {
   const { flag, label } = useMonitoredMemory(mPipe, memory);
   dbg.next("memory", flag, label);
 
+  await pause_stub();
   flag[pid] = TRUE;
   await pause_stub();
   label[pid] = max(label) + 1;
