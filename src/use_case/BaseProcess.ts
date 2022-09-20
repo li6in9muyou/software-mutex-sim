@@ -33,7 +33,7 @@ export async function pause_stub() {
   return null;
 }
 
-type IMemory = { [key: string]: Int32Array };
+export type IMemory = { [key: string]: Int32Array };
 
 export function useMonitoredMemory(sync: Subject<any>, mem: IMemory) {
   function build_proxy_handler_for_key(slice: string) {
