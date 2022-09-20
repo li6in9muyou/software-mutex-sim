@@ -13,7 +13,8 @@
     "@sveltejs/vite-plugin-svelte": "^1.0.2",
     "@tsconfig/svelte": "^3.0.0",
     "@types/jest": "^29.0.0",
-    "@types/lodash": "^4.14.184",
+    "@types/lodash": "^4.14.185",
+    "@types/debug": "^4.1.7",
     "jest": "^29.0.3",
     "svelte": "^3.49.0",
     "svelte-check": "^2.8.1",
@@ -24,7 +25,6 @@
     "vite": "^3.1.0"
   },
   "dependencies": {
-    "@types/debug": "^4.1.7",
     "debug": "^4.3.4",
     "lodash": "^4.17.21",
     "threads": "^1.7.0"
