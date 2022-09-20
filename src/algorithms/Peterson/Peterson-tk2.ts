@@ -39,7 +39,7 @@ async function lock(use_msg, pid, memory, process_count) {
 
 async function unlock(use_msgs, who, memory) {
   await pause_stub();
-  const [mPipe, c, dbg] = use_msgs();
+  const [dbg, c, mPipe] = use_msgs();
   c.next(["post", who]);
   const { level } = useMonitoredMemory(mPipe, memory);
   level[who] = 0;
