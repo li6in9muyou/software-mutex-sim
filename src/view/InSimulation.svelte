@@ -2,6 +2,7 @@
   import { range } from "lodash";
   import { readable } from "svelte/store";
   import { sleep } from "../utility";
+  import { router } from "./model";
 
   let allPaused = true;
   function toggle() {
@@ -34,7 +35,7 @@
 
 <div class="navbar mb-2 rounded bg-base-200 shadow-xl">
   <div class="navbar-start">
-    <a class="btn">back</a>
+    <a class="btn" on:click={() => router.pop()}>back</a>
   </div>
   <div class="navbar-end gap-2">
     <a class="btn btn-warning" class:btn-disabled={allPaused} on:click={toggle}>

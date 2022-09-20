@@ -1,5 +1,6 @@
 <script>
   import { join, times } from "lodash";
+  import { router } from "./model";
   let selected = "Pick one";
   $: description = join(
     times(10, () => selected),
@@ -9,9 +10,11 @@
 
 <div class="navbar mb-2 rounded bg-base-200 shadow-xl">
   <div class="navbar-start">
-    <a class="btn btn-ghost text-xl normal-case">MutexSim</a>
+    <a class="btn btn-ghost text-4xl normal-case text-accent">MutexSim</a>
   </div>
-  <div class="navbar-end"><a class="btn">next</a></div>
+  <div class="navbar-end">
+    <a class="btn" on:click={() => router.push("AlgoConfig")}>next</a>
+  </div>
 </div>
 
 <main class="p-4">
