@@ -24,10 +24,13 @@
   d("created stores %o", get(stores));
   const m = (msg) => {
     const [which, array] = msg;
+    d("attempting to update store %s %o", which, array);
     if (!isUndefined($stores[which])) {
-      d("update svelte store %s %o", which, array);
       $stores[which].set(array);
       $stores = $stores;
+      d("success");
+    } else {
+      d("segment fault %s", which);
     }
   };
 
