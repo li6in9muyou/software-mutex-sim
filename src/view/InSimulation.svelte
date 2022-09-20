@@ -56,8 +56,9 @@
     <div class="flex max-h-64 flex-col gap-3 overflow-y-auto">
       {#each range(0, 10) as pid}
         <div
-          class:bg-primary={pid === selectedPid}
-          class="flex rounded border border-primary bg-base-100 p-4"
+          class:bg-secondary={pid === selectedPid}
+          class:text-secondary-content={pid === selectedPid}
+          class="flex rounded bg-base-100 border border-accent p-4 transition-colors duration-300"
           on:click={() => (selectedPid = pid)}
         >
           <div>
@@ -106,7 +107,9 @@
   </section>
   <div class="divider my-0" />
   <section>
-    <h2 class="mb-2 text-2xl underline">source code</h2>
+    <h2 class="mb-2 text-2xl underline">
+      source code of process {selectedPid}
+    </h2>
     <ol
       class="flex max-h-64 flex-col overflow-y-auto rounded bg-base-300 text-primary-content"
     >
