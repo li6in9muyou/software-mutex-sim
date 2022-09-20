@@ -60,6 +60,7 @@ export function useMonitoredMemory(sync: Subject<any>, mem: IMemory) {
       // @ts-ignore
       build_proxy_handler_for_key(slice)
     );
+    sync.next([slice, Array.from(mem[slice])]);
   }
   return monitored;
 }
