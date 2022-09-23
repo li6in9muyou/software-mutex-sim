@@ -59,7 +59,7 @@
         <div
           class:bg-secondary={pid === selectedPid}
           class:text-secondary-content={pid === selectedPid}
-          class="flex rounded bg-base-100 border border-accent p-4 transition-colors duration-300"
+          class="flex rounded border border-accent bg-base-100 p-4 transition-colors duration-300"
           on:click={() => (selectedPid = pid)}
         >
           <div>
