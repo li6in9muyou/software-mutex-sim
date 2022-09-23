@@ -7,16 +7,50 @@
   } from "./model.js";
   import AlgorithmConfig from "./AlgorithmConfig.svelte";
   import AlgorithmSelect from "./AlgorithmSelect.svelte";
+  import Frame from "./Frame.svelte";
+
+  let offset: number;
+  $: if ($onAlgoConfigPage) {
+    offset = 1;
+  } else if ($onAlgoSelectionPage) {
+    offset = 0;
+  } else {
+    offset = 2;
+  }
 </script>
 
-<main class="p-2">
-  {#if $onInSimulationPage}
-    <InSimulation />
-  {/if}
-  {#if $onAlgoSelectionPage}
-    <AlgorithmSelect />
-  {/if}
-  {#if $onAlgoConfigPage}
-    <AlgorithmConfig />
-  {/if}
-</main>
+<div class="w-full overflow-x-hidden">
+  <main
+    class="flex w-[300vw] transition-transform duration-300 offset-{offset}"
+  >
+    <Frame>
+      {#if $onAlgoSelectionPage}
+        <AlgorithmSelect />
+      {/if}
+    </Frame>
+
+    <Frame>
+      {#if $onAlgoConfigPage}
+        <AlgorithmConfig />
+      {/if}
+    </Frame>
+
+    <Frame>
+      {#if $onInSimulationPage}
+        <InSimulation />
+      {/if}
+    </Frame>
+  </main>
+</div>
+
+<style>
+  .offset-2 {
+    transform: translateX(-66.666%);
+  }
+  .offset-1 {
+    transform: translateX(-33.3333%);
+  }
+  .offset-0 {
+    transform: translateX(0%);
+  }
+</style>
