@@ -1,8 +1,8 @@
 <script>
   import { range } from "lodash";
   import { readable } from "svelte/store";
-  import { sleep } from "../utility";
-  import { router } from "./model";
+  import { sleep } from "../../utility";
+  import { router } from "../model";
 
   let allPaused = true;
   function toggle() {

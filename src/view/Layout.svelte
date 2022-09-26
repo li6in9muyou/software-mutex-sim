@@ -1,5 +1,5 @@
 <script lang="ts">
-  import InSimulation from "./InSimulation.svelte";
+  import InSimulation from "./InSimulation/index.svelte";
   import {
     onInSimulationPage,
     onAlgoSelectionPage,
