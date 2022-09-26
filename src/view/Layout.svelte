@@ -21,7 +21,10 @@
 
 <div class="w-full overflow-x-hidden">
   <main
-    class="flex w-[300vw] transition-transform duration-300 offset-{offset}"
+    class="flex w-[300vw] transition-transform duration-300"
+    class:offset-0={offset === 0}
+    class:offset-1={offset === 1}
+    class:offset-2={offset === 2}
   >
     <Frame>
       {#if $onAlgoSelectionPage}
