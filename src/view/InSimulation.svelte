@@ -58,8 +58,10 @@
       {#each range(0, 10) as pid}
         <div
           class:bg-secondary={pid === selectedPid}
-          class:text-secondary-content={pid === selectedPid}
-          class="flex rounded border border-accent bg-base-100 p-4 transition-colors duration-300"
+          class:text-accent-content={pid === selectedPid}
+          class:bg-base-100={pid !== selectedPid}
+          class:text-base-content={pid !== selectedPid}
+          class="flex rounded border border-accent p-4 transition-colors duration-300"
           on:click={() => (selectedPid = pid)}
         >
           <div>
