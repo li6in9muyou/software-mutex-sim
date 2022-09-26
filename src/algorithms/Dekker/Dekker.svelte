@@ -14,6 +14,6 @@
     wants_to_enter,
     turn: new Int32Array(new SharedArrayBuffer(4)),
   }}
-  url={new URL("./Dekker-tk2.ts", import.meta.url)}
+  algorithm_impl_url={new URL("./Dekker-tk2.ts", import.meta.url)}
   prefix="Dekker"
 />

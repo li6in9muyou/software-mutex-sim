@@ -12,6 +12,6 @@
     flag: f,
     turn: t,
   }}
-  url={new URL("./EisenbergAndMcGuire-tk2.ts", import.meta.url)}
+  algorithm_impl_url={new URL("./EisenbergAndMcGuire-tk2.ts", import.meta.url)}
   prefix="EisenbergAndMcGuire"
 />

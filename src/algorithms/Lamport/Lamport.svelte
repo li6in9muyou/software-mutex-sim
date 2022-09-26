@@ -13,6 +13,6 @@
     flag,
     label: new Int32Array(new SharedArrayBuffer(4 * process_count)),
   }}
-  url={new URL("./Lamport-tk2.ts", import.meta.url)}
+  algorithm_impl_url={new URL("./Lamport-tk2.ts", import.meta.url)}
   prefix="Lamport"
 />

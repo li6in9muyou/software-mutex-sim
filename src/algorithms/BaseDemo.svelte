@@ -8,7 +8,7 @@
   import type { IMemory } from "../use_case/BaseProcess";
 
   export let process_count: number;
-  export let url: URL;
+  export let algorithm_impl_url: URL;
   export let prefix: string;
   export let memory: IMemory;
 
@@ -37,7 +37,7 @@
   const port = new SveltePort(process_count);
   const in_region = port.those_in_critical_region;
   const contending = port.those_contending;
-  const overview = port.process_status;
+  const overview = port.is_process_in_critical_region;
 
   const c = (msg) => {
     const [when, who] = msg;
@@ -48,7 +48,7 @@
       port.post_critical_region(who);
     }
   };
-  const dd = new StartManyProcesses(process_count, url, c, m, d);
+  const dd = new StartManyProcesses(process_count, algorithm_impl_url, c, m, d);
   d("Start Many Processes %O", dd);
   const resume = dd.resume_by_pid.bind(dd);
   const pause = dd.pause_by_pid.bind(dd);
