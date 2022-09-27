@@ -1,5 +1,5 @@
-import { get, writable } from "svelte/store";
-import { isFunction, isUndefined } from "lodash";
+import { get, type Readable, writable } from "svelte/store";
+import { identity, isFunction, isUndefined } from "lodash";
 import debug from "debug";
 import type { Subject } from "threads/observable";
 
@@ -67,3 +67,17 @@ export function createMemorySyncStoreAndSync(memory: IMemory) {
     },
   ];
 }
+
+export function make_identity_trans(s) {
+  const ans = {};
+  for (const sKey in s) {
+    ans[sKey] = identity;
+  }
+  return ans;
+}
+
+export type MemorySliceStores = Readable<{
+  [key: string]: Readable<Array<number>>;
+}>;
+
+export type MemorySliceTransformers = { [key: string]: (number) => string };
