@@ -3,16 +3,19 @@
   import StartManyProcesses from "../use_case/StartManyProcesses";
   import debug from "debug";
   import { SveltePort } from "../SveltePort";
-  import { capitalize, range } from "lodash";
+  import { capitalize, isNull, range, some } from "lodash";
   import PausePlease from "../PausePlease.svelte";
   import type { IMemory } from "./MemoryWriteSync";
   import { createMemorySyncStoreAndSync } from "./MemoryWriteSync";
   import BaseMemoryView from "./BaseMemoryView.svelte";
 
-  export let process_count: number;
-  export let algorithm_impl_url: URL;
-  export let prefix: string;
-  export let memory: IMemory;
+  export let process_count: number = null;
+  export let algorithm_impl_url: URL = null;
+  export let prefix: string = null;
+  export let memory: IMemory = null;
+  if (some([process_count, algorithm_impl_url, prefix, memory], isNull)) {
+    throw new Error("invalid arguments");
+  }
 
   const d = debug(`BaseDemo:${capitalize(prefix)}:Debug`);
   const [stores, m] = createMemorySyncStoreAndSync(memory);
