@@ -1,11 +1,8 @@
 import { expose } from "threads";
-import {
-  Demo,
-  pause_stub,
-  useMonitoredMemory,
-} from "../../use_case/BaseProcess";
+import { Demo, pause_stub } from "../../use_case/BaseProcess";
 import { Idle } from "../../utility";
 import { FALSE, TRUE } from "./constants";
+import { useMonitoredMemory } from "../MemoryWriteSync";
 
 function counterpart(id: number) {
   return id === 1 ? 0 : 1;

@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { get, writable } from "svelte/store";
+  import { get } from "svelte/store";
   import StartManyProcesses from "../use_case/StartManyProcesses";
   import debug from "debug";
   import { SveltePort } from "../SveltePort";
-  import { capitalize, isUndefined, range } from "lodash";
+  import { capitalize, range } from "lodash";
   import PausePlease from "../PausePlease.svelte";
-  import type { IMemory } from "../use_case/BaseProcess";
+  import type { IMemory } from "./MemoryWriteSync";
+  import { createMemorySyncStoreAndSync } from "./MemoryWriteSync";
 
   export let process_count: number;
   export let algorithm_impl_url: URL;
@@ -13,26 +14,8 @@
   export let memory: IMemory;
 
   const d = debug(`BaseDemo:${capitalize(prefix)}:Debug`);
-
-  const stores = writable({});
-  for (const storeLabel of Object.keys(memory)) {
-    stores.update((prev) => ({
-      ...prev,
-      [storeLabel]: writable<Array<number>>([]),
-    }));
-  }
+  const [stores, m] = createMemorySyncStoreAndSync(memory);
   d("created stores %o", get(stores));
-  const m = (msg) => {
-    const [which, array] = msg;
-    d("attempting to update store %s %o", which, array);
-    if (!isUndefined($stores[which])) {
-      $stores[which].set(array);
-      $stores = $stores;
-      d("success");
-    } else {
-      d("segment fault %s", which);
-    }
-  };
 
   const port = new SveltePort(process_count);
   const in_region = port.those_in_critical_region;
@@ -63,6 +46,7 @@
       <PausePlease {pid} {prefix} {resume} {pause} />
     {/each}
   </p>
+  <slot />
   <h2>Global Memory</h2>
   {#each Object.keys(memory) as label}
     <p>{label}: {get($stores[label])}</p>

@@ -1,11 +1,8 @@
 import { expose } from "threads";
-import {
-  Demo,
-  pause_stub,
-  useMonitoredMemory,
-} from "../../use_case/BaseProcess";
+import { Demo, pause_stub } from "../../use_case/BaseProcess";
 import { Idle, Yield } from "../../utility";
 import { identity } from "lodash";
+import { useMonitoredMemory } from "../MemoryWriteSync";
 
 function can_proceed(me, waiting_room_idx, l, v) {
   const at_highest_level = l

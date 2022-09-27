@@ -1,4 +1,4 @@
-import { isFunction, isUndefined } from "lodash";
+import { isUndefined } from "lodash";
 import { Observable, Subject } from "threads/observable";
 
 let shouldPause = false;
@@ -31,38 +31,6 @@ export async function pause_stub() {
     return null;
   }
   return null;
-}
-
-export type IMemory = { [key: string]: Int32Array };
-
-export function useMonitoredMemory(sync: Subject<any>, mem: IMemory) {
-  function build_proxy_handler_for_key(slice: string) {
-    return {
-      set(buffer: Int32Array, index: string, value: number) {
-        buffer[Number(index)] = value;
-        sync.next([slice, Array.from(buffer)]);
-        return true;
-      },
-      get(buffer: Int32Array, index: number) {
-        const element = buffer[index];
-        if (isFunction(element)) {
-          return element.bind(buffer);
-        } else {
-          return element;
-        }
-      },
-    };
-  }
-  const monitored = {} as IMemory;
-  for (const slice in mem) {
-    monitored[slice] = new Proxy(
-      mem[slice],
-      // @ts-ignore
-      build_proxy_handler_for_key(slice)
-    );
-    sync.next([slice, Array.from(mem[slice])]);
-  }
-  return monitored;
 }
 
 function lock_critical_region_unlock_cycle(
