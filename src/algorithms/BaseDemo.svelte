@@ -7,6 +7,7 @@
   import PausePlease from "../PausePlease.svelte";
   import type { IMemory } from "./MemoryWriteSync";
   import { createMemorySyncStoreAndSync } from "./MemoryWriteSync";
+  import BaseMemoryView from "./BaseMemoryView.svelte";
 
   export let process_count: number;
   export let algorithm_impl_url: URL;
@@ -46,11 +47,9 @@
       <PausePlease {pid} {prefix} {resume} {pause} />
     {/each}
   </p>
-  <slot />
-  <h2>Global Memory</h2>
-  {#each Object.keys(memory) as label}
-    <p>{label}: {get($stores[label])}</p>
-  {/each}
+  <slot {stores} {memory}>
+    <BaseMemoryView {stores} {memory} />
+  </slot>
   <h2>overview</h2>
   <p>process_status: {$overview}</p>
   <p>those in critical region: {$in_region}</p>
