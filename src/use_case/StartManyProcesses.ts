@@ -40,6 +40,18 @@ export default class StartManyProcesses {
     );
   }
 
+  pause_all() {
+    for (const process of this.processes) {
+      process.request_pause();
+    }
+  }
+
+  resume_all() {
+    for (const process of this.processes) {
+      process.resume();
+    }
+  }
+
   pause_by_pid(pid: number) {
     this.processes[pid].request_pause();
   }
