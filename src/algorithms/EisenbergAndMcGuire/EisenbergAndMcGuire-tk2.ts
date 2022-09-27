@@ -2,7 +2,7 @@ import { expose } from "threads";
 import { Demo, pause_stub } from "../../use_case/BaseProcess";
 import { Idle } from "../../utility";
 import { WANT_IN, IDLE, IN_CS } from "./constants";
-import { useMonitoredMemory } from "../MemoryWriteSync";
+import { useMonitoredMemory } from "../../use_case/MemoryWriteSync";
 
 async function lock(use_msg, who, memory, process_count) {
   const [dbg, c, mPipe] = use_msg();

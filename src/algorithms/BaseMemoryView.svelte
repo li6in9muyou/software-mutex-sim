@@ -1,7 +1,7 @@
 <script lang="ts">
   import { get } from "svelte/store";
   import type { Readable } from "svelte/store";
-  import type { IMemory } from "./MemoryWriteSync";
+  import type { IMemory } from "../use_case/MemoryWriteSync";
 
   export let memory: IMemory;
   export let stores: Readable<Readable<Array<number>>>;

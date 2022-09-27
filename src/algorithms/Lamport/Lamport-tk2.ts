@@ -3,7 +3,7 @@ import { Demo, pause_stub } from "../../use_case/BaseProcess";
 import { Idle } from "../../utility";
 import { max } from "lodash";
 import { FALSE, TRUE } from "./constants";
-import { useMonitoredMemory } from "../MemoryWriteSync";
+import { useMonitoredMemory } from "../../use_case/MemoryWriteSync";
 
 function should_wait(who: number, ...memory: Int32Array[]): boolean {
   const [label, flag] = memory;

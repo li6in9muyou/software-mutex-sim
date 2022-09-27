@@ -5,8 +5,8 @@
   import { SveltePort } from "../SveltePort";
   import { capitalize, isNull, range, some } from "lodash";
   import PausePlease from "../PausePlease.svelte";
-  import type { IMemory } from "./MemoryWriteSync";
-  import { createMemorySyncStoreAndSync } from "./MemoryWriteSync";
+  import type { IMemory } from "../use_case/MemoryWriteSync";
+  import { createMemorySyncStoreAndSync } from "../use_case/MemoryWriteSync";
   import BaseMemoryView from "./BaseMemoryView.svelte";
 
   export let process_count: number = null;

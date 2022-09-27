@@ -2,7 +2,7 @@ import { expose } from "threads";
 import { Demo, pause_stub } from "../../use_case/BaseProcess";
 import { Idle } from "../../utility";
 import { FALSE, TRUE } from "./constants";
-import { useMonitoredMemory } from "../MemoryWriteSync";
+import { useMonitoredMemory } from "../../use_case/MemoryWriteSync";
 
 function counterpart(id: number) {
   return id === 1 ? 0 : 1;
