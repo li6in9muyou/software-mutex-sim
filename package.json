@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "test": "vitest",
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json"
@@ -14,8 +15,8 @@
     "@tsconfig/svelte": "^3.0.0",
     "@types/debug": "^4.1.7",
     "@types/jest": "^29.0.0",
-    "autoprefixer": "^10.4.11",
     "@types/lodash": "^4.14.185",
+    "autoprefixer": "^10.4.11",
     "jest": "^29.0.3",
     "postcss": "^8.4.16",
     "prettier": "^2.7.1",
@@ -27,6 +28,7 @@
     "ts-jest": "^29.0.0",
     "tslib": "^2.4.0",
     "typescript": "^4.6.4",
+    "vitest": "^0.23.4",
     "vite": "^3.1.0"
   },
   "dependencies": {
