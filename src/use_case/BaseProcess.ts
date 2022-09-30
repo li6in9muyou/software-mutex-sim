@@ -8,7 +8,7 @@ let _i = 0;
 const _mem_msg = new Subject();
 const _core_msg = new Subject();
 const _debug_msg = new Subject();
-const dbg = (...args) => _debug_msg.next(args);
+const dbg = (args) => _debug_msg.next(args);
 
 function pause() {
   shouldPause = true;
@@ -71,7 +71,7 @@ export const Demo = (lock_impl, unlock_impl, critical_region) => ({
     }
   },
   async run(pid: number, ...args: any[]) {
-    dbg(`${pid} starts running with args ${args}`);
+    dbg(`${pid} starts running with args ${JSON.stringify(args)}`);
     _i = pid;
 
     const ans = await lock_critical_region_unlock_cycle(
