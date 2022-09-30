@@ -5,6 +5,7 @@ const dbg = debug("DemoDebug");
 
 export default class StartManyProcesses {
   private processes: any[];
+  private readonly create_process_promise: Promise<any>;
   constructor(
     private readonly process_count: number,
     private readonly process_url: URL,
@@ -12,7 +13,7 @@ export default class StartManyProcesses {
     private readonly memory_msg_subscriber: (ev: any) => void,
     private readonly debug_msg_subscriber = (...args) => dbg(args)
   ) {
-    Promise.all(
+    this.create_process_promise = Promise.all(
       new Array(this.process_count).fill(null).map(async () => {
         const c = await spawn(
           new Worker(this.process_url, {
@@ -24,10 +25,15 @@ export default class StartManyProcesses {
         await c.debug_msg().subscribe(this.debug_msg_subscriber);
         return c;
       })
-    ).then((processes) => (this.processes = processes));
+    );
+    this.create_process_promise.then((processes) => {
+      this.processes = processes;
+      note("created processes");
+    });
   }
 
   async run(...args) {
+    await this.create_process_promise;
     note("after spawning, %o", this.processes);
     return await Promise.all(
       this.processes.map(async (cpu, pid) => {
