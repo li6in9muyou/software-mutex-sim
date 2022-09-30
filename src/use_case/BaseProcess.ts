@@ -1,5 +1,6 @@
-import { isUndefined } from "lodash";
+import { isUndefined, merge } from "lodash";
 import { Observable, Subject } from "threads/observable";
+import type { RunningSyncEvent } from "./RunningSync";
 
 let shouldPause = false;
 let _resolve: (value: null) => void;
@@ -7,6 +8,7 @@ let _pause: Promise<null>;
 let _i = 0;
 const _mem_msg = new Subject();
 const _core_msg = new Subject();
+const _running_sync_msg = new Subject<RunningSyncEvent>();
 const _debug_msg = new Subject();
 const dbg = (args) => _debug_msg.next(args);
 
@@ -27,10 +29,25 @@ function use_message_bus() {
 export async function pause_stub() {
   if (shouldPause) {
     dbg(`${_i} is paused`);
+    _running_sync_msg.next({
+      type: "paused",
+      payload: _i,
+    });
     await _pause;
-    return null;
   }
+  _running_sync_msg.next({
+    type: "running",
+    payload: _i,
+  });
   return null;
+}
+
+export async function break_point(lineno: number, message?: string) {
+  _running_sync_msg.next({
+    type: "lineno",
+    payload: { pid: _i, lineno, message },
+  });
+  await pause_stub();
 }
 
 function lock_critical_region_unlock_cycle(
@@ -50,7 +67,10 @@ export const Demo = (lock_impl, unlock_impl, critical_region) => ({
     return Observable.from(_mem_msg);
   },
   core_msg() {
-    return Observable.from(_core_msg);
+    return merge(
+      Observable.from(_core_msg),
+      Observable.from(_running_sync_msg)
+    );
   },
   debug_msg() {
     return Observable.from(_debug_msg);

@@ -1,5 +1,5 @@
 import { expose } from "threads";
-import { Demo, pause_stub } from "../../use_case/BaseProcess";
+import { break_point, Demo, pause_stub } from "../../use_case/BaseProcess";
 import { Idle } from "../../utility";
 import { max } from "lodash";
 import { FALSE, TRUE } from "./constants";
@@ -23,15 +23,15 @@ async function lock(use_msg, pid, memory, process_count) {
   const { flag, label } = useMonitoredMemory(mPipe, memory);
   dbg.next("memory", flag, label);
 
-  await pause_stub();
+  await break_point(0);
   flag[pid] = TRUE;
-  await pause_stub();
+  await break_point(1);
   label[pid] = max(label) + 1;
-  await pause_stub();
-  do {
-    await pause_stub();
-  } while (should_wait(pid, label, flag));
-  await pause_stub();
+  await break_point(2);
+  await break_point(3);
+  do {} while (should_wait(pid, label, flag));
+  await break_point(4);
+  await break_point(5);
 
   c.next(["pre", pid]);
 }
@@ -42,7 +42,9 @@ async function unlock(use_msgs, who, memory) {
 
   await pause_stub();
   const { flag } = useMonitoredMemory(mPipe, memory);
+  await break_point(6);
   flag[who] = FALSE;
+  await break_point(7);
 
   dbg.next("unlock");
   await pause_stub();

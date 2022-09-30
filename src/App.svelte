@@ -2,11 +2,12 @@
   import InSimulation from "./view/InSimulation/Main.svelte";
   import { FALSE } from "./algorithms/Dekker/constants";
   import { createMemorySyncStoreAndSync } from "./use_case/MemoryWriteSync";
-  import { get, readable } from "svelte/store";
+  import { get } from "svelte/store";
   import ContendingOrNot from "./port/ContendingOrNot";
-  import StartManyProcesses from "./use_case/StartManyProcesses";
-  import { mockLineno } from "./view/InSimulation/utility";
+  import SingleObservableAdapter from "./use_case/SingleObservableAdapter";
   import debug from "debug";
+  import RunningSync from "./use_case/RunningSync";
+  import { SveltePort } from "./SveltePort";
   const d = debug(`App`);
 
   const process_count = 4;
@@ -22,15 +23,16 @@
   const [memory_store, m] = createMemorySyncStoreAndSync(memory);
   d("created stores %o", get(memory_store));
 
-  const con = new ContendingOrNot(prefix, process_count);
+  const port = new SveltePort(process_count);
+  const con = new ContendingOrNot(prefix, port);
+  const soa = new SingleObservableAdapter(process_count, algorithm_impl_url);
+  soa.messages.subscribe(con.core_message_handler);
+  soa.messages.subscribe(con.debug_message_handler);
+  soa.messages.subscribe(m);
 
-  const dd = new StartManyProcesses(
-    process_count,
-    algorithm_impl_url,
-    con.core_message_handler,
-    m,
-    con.debug_message_handler
-  );
+  const runningSync = new RunningSync(process_count, soa.messages);
+
+  const dd = soa.processes_handle;
   function run() {
     dd.run(memory, process_count);
   }
@@ -40,9 +42,9 @@
   const [is_in_region, ,] = con.get_stores_overview_contending_acquired();
   const per_process_state = {
     process_count,
-    running: readable(new Array(process_count).fill(false)),
+    running: runningSync.running,
     in_critical_region_or_not: is_in_region,
-    lineno: mockLineno(process_count),
+    lineno: runningSync.lineno,
   };
 </script>
 
