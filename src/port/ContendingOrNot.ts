@@ -1,27 +1,40 @@
-import { SveltePort } from "../SveltePort";
+import type { SveltePort } from "../SveltePort";
 import debug from "debug";
 import type { Readable } from "svelte/store";
-import { capitalize } from "lodash";
+import { capitalize, isArray } from "lodash";
+import type { Observable } from "threads/observable";
+
+export type ContendingOrNotEvent = ["pre" | "post", number];
 
 export default class ContendingOrNot {
-  private readonly port: SveltePort;
   public readonly debug_message_handler: (...args: any[]) => void;
 
-  constructor(private readonly name: string, process_count: number) {
-    this.port = new SveltePort(process_count);
+  constructor(
+    private readonly name: string,
+    private readonly port: SveltePort
+  ) {
     this.debug_message_handler = debug(
       `ContendingOrNot:${capitalize(this.name)}:Debug`
     );
   }
 
+  attach(source: Observable<ContendingOrNotEvent>) {
+    source.subscribe(this.core_message_handler);
+  }
+
   get core_message_handler(): (msg: any) => void {
     return (msg) => {
-      const [when, who] = msg;
-      this.debug_message_handler("core msg %o", msg);
-      if (when === "pre") {
-        this.port.pre_critical_region(who);
-      } else {
-        this.port.post_critical_region(who);
+      if (isArray(msg) && msg.length === 2) {
+        this.debug_message_handler("core msg %o", msg);
+        const [when, who] = msg;
+        switch (when) {
+          case "pre": {
+            return this.port.pre_critical_region(who);
+          }
+          case "post": {
+            return this.port.post_critical_region(who);
+          }
+        }
       }
     };
   }
