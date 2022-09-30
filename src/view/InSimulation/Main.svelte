@@ -1,29 +1,39 @@
-<script>
+<script lang="ts">
   import { range } from "lodash";
-  import { readable } from "svelte/store";
+  import { get, type Readable } from "svelte/store";
   import { sleep } from "../../utility";
   import { router } from "../model";
+  import { type MemorySliceStores } from "../../use_case/MemoryWriteSync";
+  import debug from "debug";
+  import { onMount } from "svelte";
+  import Memory from "./Memory.svelte";
+  const note = debug("InSimulation::Main");
 
-  let allPaused = true;
-  function toggle() {
-    allPaused = !allPaused;
-  }
-  const processRunningState = new Array(10).fill(true);
+  export let use_case = null;
+  export let memory_store: MemorySliceStores = null;
+  export let per_process_state: {
+    process_count: number;
+    running: Readable<boolean[]>;
+    in_critical_region_or_not: Readable<boolean[]>;
+    lineno: Readable<number[]>;
+  } = null;
 
-  let selectedPid = 0;
-  let turn = 3;
-  let _c = 4;
-  const currentLineno = readable(_c, (set) => {
-    const i = setInterval(() => {
-      _c += 1;
-      _c %= 7;
-      set(_c);
-    }, 500);
-    return () => clearInterval(i);
+  const {
+    running: processRunningState,
+    in_critical_region_or_not: is_in_region,
+    lineno: many_lineno,
+    process_count,
+  } = per_process_state;
+
+  onMount(() => {
+    note("begin!");
+    note(
+      "stores: %o",
+      [processRunningState, is_in_region, many_lineno].map((s: any) => get(s))
+    );
   });
 
   let showPauseSpinner = false;
-
   function toggle_process_running(pid) {
     showPauseSpinner = true;
     sleep(500).then(() => {
@@ -31,6 +41,20 @@
       processRunningState[pid] = !processRunningState[pid];
     });
   }
+
+  let allPaused = true;
+  function onToggleAllRunOrPause() {
+    allPaused = !allPaused;
+  }
+
+  let started = false;
+  function onStartSim() {
+    started = true;
+    allPaused = false;
+    use_case.run();
+  }
+
+  let selectedPid = 0;
 </script>
 
 <div class="navbar mb-2 rounded bg-base-200 shadow-xl">
@@ -38,16 +62,23 @@
     <a class="btn" on:click={() => router.pop()}>back</a>
   </div>
   <div class="navbar-end gap-2">
-    <a class="btn btn-warning" class:btn-disabled={allPaused} on:click={toggle}>
-      pause all
-    </a>
-    <a
-      class="btn btn-success"
-      class:btn-disabled={!allPaused}
-      on:click={toggle}
-    >
-      resume all
-    </a>
+    {#if started}
+      <a
+        class="btn btn-warning"
+        class:btn-disabled={allPaused}
+        on:click={onToggleAllRunOrPause}
+      >
+        pause all
+      </a>
+      <a
+        class="btn btn-success"
+        class:btn-disabled={!allPaused}
+        on:click={onToggleAllRunOrPause}
+      >
+        resume all
+      </a>{:else}
+      <button class="btn btn-success" on:click={onStartSim}> start </button>
+    {/if}
   </div>
 </div>
 
@@ -55,7 +86,7 @@
   <section>
     <h2 class="mb-2 text-2xl underline">inspect one process</h2>
     <div class="flex max-h-64 flex-col gap-3 overflow-y-auto">
-      {#each range(0, 10) as pid}
+      {#each range(0, process_count) as pid}
         <div
           class:bg-secondary={pid === selectedPid}
           class:text-accent-content={pid === selectedPid}
@@ -65,7 +96,9 @@
           on:click={() => (selectedPid = pid)}
         >
           <div>
-            {`pid ${pid} status`}
+            {`pid ${pid} status ${
+              $is_in_region[pid] ? "in critical region" : "contending"
+            }`}
           </div>
           <button
             class:btn-disabled={pid !== selectedPid}
@@ -117,7 +150,7 @@
       class="flex max-h-64 flex-col overflow-y-auto rounded bg-base-300 text-primary-content"
     >
       {#each range(0, 7) as lineno}
-        {#if lineno === $currentLineno}
+        {#if lineno === $many_lineno[selectedPid]}
           <li class="indicator ml-4">
             <span
               class="badge indicator-item badge-secondary badge-sm indicator-start indicator-middle"
@@ -136,22 +169,8 @@
   </section>
   <div class="divider my-0" />
   <section class="flex flex-grow flex-col gap-2">
-    <h2 class="mb-2 text-2xl underline">shard memory</h2>
-    <div>
-      <div class="mb-2 text-xl">level</div>
-      <div class="mb-3 flex w-full gap-1">
-        {#each range(-5, 5) as idx}
-          <div
-            class="flex flex-1 justify-center border border-secondary text-xl"
-          >
-            {(idx + 1) * (idx + 1)}
-          </div>
-        {/each}
-      </div>
-    </div>
-    <div>
-      <div class="mb-2 text-xl">turn</div>
-      <div class="text-2xl">{turn}</div>
-    </div>
+    <slot>
+      <Memory stores={memory_store} />
+    </slot>
   </section>
 </main>
