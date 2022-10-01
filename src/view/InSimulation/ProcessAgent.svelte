@@ -1,18 +1,12 @@
 <script lang="ts">
   import { ProcessState } from "../../use_case/RunningSync";
-  import type { Readable } from "svelte/store";
-  import debug from "debug";
-  import { get } from "svelte/store";
-  const note = debug("ProcessAgent");
 
   export let pid: number;
   export let showPauseSpinner: boolean;
   export let selectedPid: number;
-  export let in_region: Readable<ProcessState[]>;
-  export let running: Readable<boolean[]>;
+  export let in_region: ProcessState[];
+  export let running: boolean[];
   export let toggle_process_running: (pid: number) => void;
-
-  note(in_region, running, get(in_region), get(running));
 </script>
 
 <div
@@ -24,14 +18,12 @@
   on:click={() => (selectedPid = pid)}
 >
   <div>
-    {`pid ${pid} status ${
-      $in_region[pid] ? "in critical region" : "contending"
-    }`}
+    {`pid ${pid} status ${in_region ? "in critical region" : "contending"}`}
   </div>
   <button
     class:btn-disabled={pid !== selectedPid}
-    class:btn-warning={$running[pid]}
-    class:btn-success={!$running[pid]}
+    class:btn-warning={running}
+    class:btn-success={!running}
     class="btn btn-sm ml-auto"
     on:click={() => toggle_process_running(pid)}
   >
@@ -63,6 +55,6 @@
         />
       </svg>
     {/if}
-    {$running[pid] ? "pause" : "resume"}
+    {running ? "pause" : "resume"}
   </button>
 </div>

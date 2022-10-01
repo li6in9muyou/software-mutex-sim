@@ -95,8 +95,8 @@
           {pid}
           bind:selectedPid
           bind:showPauseSpinner
-          in_region={is_in_region}
-          running={processRunningState}
+          in_region={$is_in_region[pid]}
+          running={$processRunningState[pid]}
           {toggle_process_running}
         />
       {/each}
