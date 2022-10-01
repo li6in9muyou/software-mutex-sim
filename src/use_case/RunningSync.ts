@@ -36,14 +36,14 @@ export default class RunningSync {
   ) {
     this._lineno = writable(times(process_count, constant(0)));
     this._running = writable(
-      times(process_count, constant(ProcessState.running))
+      times(process_count, constant(ProcessState.paused))
     );
 
     this.source
       .filter(
         (ev) =>
           ev.type === "paused" ||
-          ev.type === "resumed" ||
+          ev.type === "running" ||
           ev.type === "lineno" ||
           ev.type === "completed"
       )

@@ -5,7 +5,7 @@ import RunningSync, {
 } from "../use_case/RunningSync";
 import { Observable, Subject } from "threads/observable";
 import { get } from "svelte/store";
-import { every } from "lodash";
+import { constant, every, times } from "lodash";
 
 describe("RunningSync", () => {
   let source: Subject<RunningSyncEvent>;
@@ -13,15 +13,20 @@ describe("RunningSync", () => {
     source = new Subject();
   });
 
+  it("should init every running to paused", () => {
+    const rs = new RunningSync(3, Observable.from(source));
+    expect(rs).toBeTruthy();
+    expect(get(rs.running)).toEqual(times(3, constant(ProcessState.paused)));
+  });
+
   it("should update running state", () => {
     const rs = new RunningSync(3, Observable.from(source));
     expect(rs).toBeTruthy();
     expect(rs.running.subscribe).toBeTypeOf("function");
-    expect(
-      every(get(rs.running), (v) => v === ProcessState.running)
-    ).toBeTruthy();
+
     source.next({ type: "paused", payload: 0 });
     expect(get(rs.running)[0]).toEqual(ProcessState.paused);
+    source.next({ type: "running", payload: 1 });
     expect(get(rs.running)[1]).toEqual(ProcessState.running);
   });
 

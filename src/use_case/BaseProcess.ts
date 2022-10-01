@@ -61,6 +61,10 @@ function lock_critical_region_unlock_cycle(
   critical_region
 ) {
   return async (useMessageBus, pid: number, ...args: any[]) => {
+    _running_sync_msg.next({
+      type: "running",
+      payload: _i,
+    });
     await lock_impl(useMessageBus, pid, ...args);
     _core_msg.next(["pre", pid]);
     await critical_region();
