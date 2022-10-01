@@ -48,6 +48,7 @@ export async function break_point(lineno: number, message?: string) {
     type: "lineno",
     payload: { pid: _i, lineno, message },
   });
+  pause();
   await pause_stub();
 }
 
