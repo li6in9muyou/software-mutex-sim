@@ -18,7 +18,7 @@ function should_wait(who: number, ...memory: Int32Array[]): boolean {
 }
 
 async function lock(use_msg, pid, memory, process_count) {
-  const [dbg, c, mPipe] = use_msg();
+  const [dbg, , mPipe] = use_msg();
   dbg.next("lock received args: ", memory, process_count);
   const { flag, label } = useMonitoredMemory(mPipe, memory);
   dbg.next("memory", flag, label);
@@ -32,13 +32,10 @@ async function lock(use_msg, pid, memory, process_count) {
   do {} while (should_wait(pid, label, flag));
   await break_point(4);
   await break_point(5);
-
-  c.next(["pre", pid]);
 }
 
 async function unlock(use_msgs, who, memory) {
-  const [dbg, c, mPipe] = use_msgs();
-  c.next(["post", who]);
+  const [dbg, , mPipe] = use_msgs();
 
   await pause_stub();
   const { flag } = useMonitoredMemory(mPipe, memory);

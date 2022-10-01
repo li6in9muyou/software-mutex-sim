@@ -5,7 +5,7 @@ import { WANT_IN, IDLE, IN_CS } from "./constants";
 import { useMonitoredMemory } from "../../use_case/MemoryWriteSync";
 
 async function lock(use_msg, who, memory, process_count) {
-  const [dbg, c, mPipe] = use_msg();
+  const [dbg, , mPipe] = use_msg();
   dbg.next("lock received args: ", memory, process_count);
   const { flag, turn } = useMonitoredMemory(mPipe, memory);
   dbg.next("memory", flag, turn);
@@ -41,14 +41,11 @@ async function lock(use_msg, who, memory, process_count) {
   await pause_stub();
   turn[0] = i;
   await pause_stub();
-
-  c.next(["pre", who]);
 }
 
 async function unlock(use_msgs, who, memory, process_count) {
-  const [dbg, c, mPipe] = use_msgs();
+  const [dbg, , mPipe] = use_msgs();
   const { flag, turn } = useMonitoredMemory(mPipe, memory);
-  c.next(["post", who]);
   await pause_stub();
   let pid = (turn[0] + 1) % process_count;
   while (true) {

@@ -9,7 +9,7 @@ function counterpart(id: number) {
 }
 
 async function lock(use_msg, who, memory) {
-  const [dbg, c, mPipe] = use_msg();
+  const [dbg, , mPipe] = use_msg();
   dbg.next("lock received args: ", memory);
   const { wants_to_enter, turn } = useMonitoredMemory(mPipe, memory);
   dbg.next("memory", wants_to_enter, turn);
@@ -31,12 +31,10 @@ async function lock(use_msg, who, memory) {
     }
     await pause_stub();
   }
-  c.next(["pre", who]);
 }
 
 async function unlock(use_msgs, who, memory) {
-  const [dbg, c, mPipe] = use_msgs();
-  c.next(["post", who]);
+  const [dbg, , mPipe] = use_msgs();
   const { turn, wants_to_enter } = useMonitoredMemory(mPipe, memory);
   await pause_stub();
   wants_to_enter[who] = FALSE;

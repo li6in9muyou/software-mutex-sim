@@ -15,7 +15,7 @@ function can_proceed(me, waiting_room_idx, l, v) {
 }
 
 async function lock(use_msg, pid, memory, process_count) {
-  const [dbg, c, mPipe] = use_msg();
+  const [dbg, , mPipe] = use_msg();
   dbg.next("lock received args: ", memory, process_count);
   const { level, victim } = useMonitoredMemory(mPipe, memory);
   dbg.next("memory", level, victim);
@@ -31,13 +31,11 @@ async function lock(use_msg, pid, memory, process_count) {
     } while (!can_proceed(pid, i, level, victim));
     await Yield();
   }
-  c.next(["pre", pid]);
 }
 
 async function unlock(use_msgs, who, memory) {
   await pause_stub();
-  const [dbg, c, mPipe] = use_msgs();
-  c.next(["post", who]);
+  const [dbg, , mPipe] = use_msgs();
   const { level } = useMonitoredMemory(mPipe, memory);
   level[who] = 0;
   dbg.next("unlock");

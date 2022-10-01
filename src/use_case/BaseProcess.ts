@@ -1,5 +1,6 @@
-import { isUndefined, merge } from "lodash";
+import { isUndefined } from "lodash";
 import { Observable, Subject } from "threads/observable";
+import { merge } from "observable-fns";
 import type { RunningSyncEvent } from "./RunningSync";
 
 let shouldPause = false;
@@ -57,7 +58,9 @@ function lock_critical_region_unlock_cycle(
 ) {
   return async (useMessageBus, pid: number, ...args: any[]) => {
     await lock_impl(useMessageBus, pid, ...args);
+    _core_msg.next(["pre", pid]);
     await critical_region();
+    _core_msg.next(["post", pid]);
     await unlock_impl(useMessageBus, pid, ...args);
   };
 }
