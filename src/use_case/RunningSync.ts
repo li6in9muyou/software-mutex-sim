@@ -1,16 +1,18 @@
-import { writable } from "svelte/store";
+import { derived, writable } from "svelte/store";
 import type { Readable, Writable } from "svelte/store";
 import type { Observable } from "threads/observable";
 import debug from "debug";
-import { constant, times } from "lodash";
+import { constant, every, times } from "lodash";
 const note = debug("RunningSync");
 
 export enum ProcessState {
   running,
   paused,
+  completed,
 }
 
 export type RunningSyncEvent =
+  | { type: "completed"; payload: number }
   | {
       type: "lineno";
       payload: { pid: number; lineno: number; message?: string };
@@ -40,7 +42,10 @@ export default class RunningSync {
     this.source
       .filter(
         (ev) =>
-          ev.type === "paused" || ev.type === "resumed" || ev.type === "lineno"
+          ev.type === "paused" ||
+          ev.type === "resumed" ||
+          ev.type === "lineno" ||
+          ev.type === "completed"
       )
       .subscribe(this.subscriber.bind(this));
   }
@@ -65,6 +70,13 @@ export default class RunningSync {
       case "running": {
         this._running.update((arr) => {
           arr[ev.payload] = ProcessState.running;
+          return arr;
+        });
+        break;
+      }
+      case "completed": {
+        this._running.update((arr) => {
+          arr[ev.payload] = ProcessState.completed;
           return arr;
         });
         break;

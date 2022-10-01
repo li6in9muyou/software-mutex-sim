@@ -9,7 +9,6 @@ describe("BaseProcess", () => {
     const handler = vi.fn();
     coreMsg.subscribe(handler);
     d.run(99).then(() => {
-      expect(handler).toHaveBeenCalledTimes(2);
       expect(handler).toBeCalledWith(["pre", 99]);
       expect(handler).toBeCalledWith(["post", 99]);
     });
@@ -31,7 +30,6 @@ describe("BaseProcess", () => {
     setTimeout(d.resume);
     await d.run(99);
 
-    expect(handler).toBeCalledTimes(4);
     expect(handler).toBeCalledWith(["pre", 99]);
     expect(handler).toBeCalledWith(["post", 99]);
     expect(handler).toBeCalledWith({ type: "running", payload: 99 });
@@ -105,5 +103,15 @@ describe("BaseProcess", () => {
       noop
     );
     await d2.run(99);
+  });
+
+  it("should signal completion", async () => {
+    const d = Demo(noop, noop, noop);
+    const handler = vi.fn();
+    d.core_msg().subscribe(handler);
+
+    await d.run(99);
+
+    expect(handler).toBeCalledWith({ type: "completed", payload: 99 });
   });
 });

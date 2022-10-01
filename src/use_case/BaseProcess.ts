@@ -66,6 +66,7 @@ function lock_critical_region_unlock_cycle(
     await critical_region();
     _core_msg.next(["post", pid]);
     await unlock_impl(useMessageBus, pid, ...args);
+    _core_msg.next({ type: "completed", payload: pid });
   };
 }
 
