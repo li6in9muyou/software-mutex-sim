@@ -4,6 +4,7 @@ import { merge } from "observable-fns";
 import type { RunningSyncEvent } from "./RunningSync";
 
 let shouldPause = false;
+let _pauseAtEveryBreakpoint = false;
 let _resolve: (value: null) => void;
 let _pause: Promise<null>;
 let _i = 0;
@@ -48,7 +49,9 @@ export async function break_point(lineno: number, message?: string) {
     type: "lineno",
     payload: { pid: _i, lineno, message },
   });
-  pause();
+  if (_pauseAtEveryBreakpoint) {
+    pause();
+  }
   await pause_stub();
 }
 
@@ -94,6 +97,9 @@ export const Demo = (lock_impl, unlock_impl, critical_region) => ({
       dbg("already paused");
     }
   },
+  enable_breakpoints() {
+    _pauseAtEveryBreakpoint = true;
+  },
   async run(pid: number, ...args: any[]) {
     dbg(`${pid} starts running with args ${JSON.stringify(args)}`);
     _i = pid;
@@ -105,6 +111,7 @@ export const Demo = (lock_impl, unlock_impl, critical_region) => ({
     )(use_message_bus, pid, ...args);
 
     dbg(`${pid} completed`);
+    _pauseAtEveryBreakpoint = false;
     return [ans, pid];
   },
 });

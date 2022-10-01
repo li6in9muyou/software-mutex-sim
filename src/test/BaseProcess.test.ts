@@ -1,5 +1,5 @@
 import { noop } from "lodash";
-import { vi, it, describe, expect } from "vitest";
+import { vi, it, describe, expect, beforeEach } from "vitest";
 import { break_point, Demo, pause_stub } from "../use_case/BaseProcess";
 
 describe("BaseProcess", () => {
@@ -52,6 +52,7 @@ describe("BaseProcess", () => {
     const handler = vi.fn();
     coreMsg.subscribe(handler);
 
+    d.enable_breakpoints();
     setTimeout(d.resume);
     setTimeout(d.resume);
     setTimeout(d.resume);
@@ -65,5 +66,44 @@ describe("BaseProcess", () => {
       });
       expect(handler).toBeCalledWith({ type: "paused", payload: 99 });
     }
+  });
+
+  it("should default to not pausing at every breakpoint", async () => {
+    const d = Demo(
+      async () => {
+        await break_point(1);
+      },
+      noop,
+      noop
+    );
+    const handler = vi.fn();
+    d.core_msg().subscribe(handler);
+
+    await d.run(99);
+  });
+
+  it("should reset breakpoint settings after each run", async () => {
+    const d = Demo(
+      async () => {
+        await break_point(1);
+      },
+      noop,
+      noop
+    );
+    const handler = vi.fn();
+    d.core_msg().subscribe(handler);
+
+    d.enable_breakpoints();
+    setTimeout(d.resume);
+    await d.run(99);
+
+    const d2 = Demo(
+      async () => {
+        await break_point(1);
+      },
+      noop,
+      noop
+    );
+    await d2.run(99);
   });
 });
