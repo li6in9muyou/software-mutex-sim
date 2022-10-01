@@ -1,8 +1,8 @@
-import { derived, writable } from "svelte/store";
+import { writable } from "svelte/store";
 import type { Readable, Writable } from "svelte/store";
 import type { Observable } from "threads/observable";
 import debug from "debug";
-import { constant, every, times } from "lodash";
+import { constant, times } from "lodash";
 const note = debug("RunningSync");
 
 export enum ProcessState {
