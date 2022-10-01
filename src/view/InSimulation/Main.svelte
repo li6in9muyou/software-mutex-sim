@@ -8,13 +8,14 @@
   import { onMount } from "svelte";
   import Memory from "./Memory.svelte";
   import ProcessAgent from "./ProcessAgent.svelte";
+  import { type ProcessState } from "../../use_case/RunningSync";
   const note = debug("InSimulation::Main");
 
   export let use_case = null;
   export let memory_store: MemorySliceStores = null;
   export let per_process_state: {
     process_count: number;
-    running: Writable<boolean[]>;
+    running: Writable<ProcessState[]>;
     in_critical_region_or_not: Readable<boolean[]>;
     lineno: Readable<number[]>;
   } = null;
