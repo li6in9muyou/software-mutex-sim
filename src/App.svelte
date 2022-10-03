@@ -8,6 +8,7 @@
   import debug from "debug";
   import RunningSync from "./use_case/RunningSync";
   import { SveltePort } from "./SveltePort";
+  import type IProcessHandle from "./use_case/ProcessHandle";
   const d = debug(`App`);
 
   const process_count = 4;
@@ -32,12 +33,11 @@
 
   const runningSync = new RunningSync(process_count, soa.messages);
 
-  const dd = soa.processes_handle;
-  function run() {
-    dd.run(memory, process_count);
-  }
-
-  d("Start Many Processes %O", dd);
+  const ProcessHandle: IProcessHandle = {
+    run: () => soa.processes_handle.run(memory, process_count),
+    resume: (pid: number) => soa.processes_handle.resume_by_pid(pid),
+    pause: (pid: number) => soa.processes_handle.pause_by_pid(pid),
+  };
 
   const [is_in_region, ,] = con.get_stores_overview_contending_acquired();
   const per_process_state = {
@@ -48,4 +48,4 @@
   };
 </script>
 
-<InSimulation {per_process_state} {memory_store} use_case={{ run }} />
+<InSimulation {per_process_state} {memory_store} {ProcessHandle} />

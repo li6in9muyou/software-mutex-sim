@@ -1,7 +1,6 @@
 <script lang="ts">
   import { range } from "lodash";
   import { get, type Readable, type Writable } from "svelte/store";
-  import { sleep } from "../../utility";
   import { router } from "../model";
   import { type MemorySliceStores } from "../../use_case/MemoryWriteSync";
   import debug from "debug";
@@ -9,9 +8,9 @@
   import Memory from "./Memory.svelte";
   import ProcessAgent from "./ProcessAgent.svelte";
   import { type ProcessState } from "../../use_case/RunningSync";
+  import type IProcessHandle from "../../use_case/ProcessHandle";
   const note = debug("InSimulation::Main");
 
-  export let use_case = null;
   export let memory_store: MemorySliceStores = null;
   export let per_process_state: {
     process_count: number;
@@ -19,6 +18,7 @@
     in_critical_region_or_not: Readable<boolean[]>;
     lineno: Readable<number[]>;
   } = null;
+  export let ProcessHandle: IProcessHandle;
 
   const {
     running: processRunningState,
@@ -35,18 +35,6 @@
     );
   });
 
-  let showPauseSpinner = false;
-  function toggle_process_running(pid) {
-    showPauseSpinner = true;
-    sleep(500).then(() => {
-      showPauseSpinner = false;
-      processRunningState.update((arr) => {
-        arr[pid] = !arr[pid];
-        return arr;
-      });
-    });
-  }
-
   let allPaused = true;
   function onToggleAllRunOrPause() {
     allPaused = !allPaused;
@@ -56,7 +44,7 @@
   function onStartSim() {
     started = true;
     allPaused = false;
-    use_case.run();
+    ProcessHandle.run();
   }
 
   let selectedPid = 0;
@@ -95,10 +83,8 @@
         <ProcessAgent
           {pid}
           bind:selectedPid
-          bind:showPauseSpinner
           in_region={$is_in_region[pid]}
-          running={$processRunningState[pid]}
-          {toggle_process_running}
+          procState={$processRunningState[pid]}
         />
       {/each}
     </div>
