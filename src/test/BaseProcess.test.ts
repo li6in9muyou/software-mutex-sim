@@ -1,5 +1,5 @@
 import { noop } from "lodash";
-import { vi, it, describe, expect, beforeEach } from "vitest";
+import { vi, it, describe, expect } from "vitest";
 import { break_point, Demo, pause_stub } from "../use_case/BaseProcess";
 
 describe("BaseProcess", () => {
@@ -115,7 +115,7 @@ describe("BaseProcess", () => {
     expect(handler).toBeCalledWith({ type: "completed", payload: 99 });
   });
 
-  it("should not intervene other processes", async () => {
+  it("should not send messages to other process's subscriber", async () => {
     const one = Demo(noop, noop, noop);
     const two = Demo(noop, noop, noop);
     const one_handler = vi.fn();
@@ -126,7 +126,7 @@ describe("BaseProcess", () => {
     await one.run(99);
     await two.run(199);
 
-    const helper = (pid, handler) => {
+    const expect_receive_own_messages = (pid, handler) => {
       expect(handler).toHaveBeenNthCalledWith(1, {
         type: "ready",
         payload: pid,
@@ -136,8 +136,55 @@ describe("BaseProcess", () => {
         payload: pid,
       });
     };
+    expect_receive_own_messages(99, one_handler);
+    expect_receive_own_messages(199, two_handler);
 
-    helper(99, one_handler);
-    helper(199, two_handler);
+    const expect_not_receive_others = (another_pid, handler) => {
+      expect(handler).not.toHaveBeenNthCalledWith(1, {
+        type: "ready",
+        payload: another_pid,
+      });
+      expect(handler).not.toHaveBeenLastCalledWith({
+        type: "completed",
+        payload: another_pid,
+      });
+    };
+
+    expect_not_receive_others(199, one_handler);
+    expect_not_receive_others(99, two_handler);
+  });
+
+  it("should not pause other processes", async () => {
+    const one = Demo(
+      async () => {
+        await pause_stub();
+      },
+      noop,
+      noop
+    );
+    const two = Demo(
+      async () => {
+        await pause_stub();
+      },
+      noop,
+      noop
+    );
+    const one_handler = vi.fn();
+    const two_handler = vi.fn();
+    one.core_msg().subscribe(one_handler);
+    two.core_msg().subscribe(two_handler);
+
+    one.request_pause();
+    setTimeout(one.resume);
+    await Promise.all([one.run(99), two.run(199)]);
+
+    expect(two_handler).not.toBeCalledWith({
+      payload: 199,
+      type: "paused",
+    });
+    expect(one_handler).not.toBeCalledWith({
+      payload: 99,
+      type: "paused",
+    });
   });
 });
