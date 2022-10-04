@@ -85,6 +85,7 @@
           bind:selectedPid
           in_region={$is_in_region[pid]}
           procState={$processRunningState[pid]}
+          {ProcessHandle}
         />
       {/each}
     </div>

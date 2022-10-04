@@ -60,6 +60,10 @@ function lock_critical_region_unlock_cycle(
   unlock_impl,
   critical_region
 ) {
+  _running_sync_msg.next({
+    type: "ready",
+    payload: _i,
+  });
   return async (useMessageBus, pid: number, ...args: any[]) => {
     _running_sync_msg.next({
       type: "running",

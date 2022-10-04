@@ -9,9 +9,11 @@ export enum ProcessState {
   running,
   paused,
   completed,
+  ready,
 }
 
 export type RunningSyncEvent =
+  | { type: "ready"; payload: number }
   | { type: "completed"; payload: number }
   | {
       type: "lineno";
@@ -36,12 +38,13 @@ export default class RunningSync {
   ) {
     this._lineno = writable(times(process_count, constant(0)));
     this._running = writable(
-      times(process_count, constant(ProcessState.paused))
+      times(process_count, constant(ProcessState.ready))
     );
 
     this.source
       .filter(
         (ev) =>
+          ev.type === "ready" ||
           ev.type === "paused" ||
           ev.type === "running" ||
           ev.type === "lineno" ||
@@ -56,6 +59,13 @@ export default class RunningSync {
       case "lineno": {
         this._lineno.update((arr) => {
           arr[ev.payload.pid] = ev.payload.lineno;
+          return arr;
+        });
+        break;
+      }
+      case "ready": {
+        this._running.update((arr) => {
+          arr[ev.payload] = ProcessState.ready;
           return arr;
         });
         break;
