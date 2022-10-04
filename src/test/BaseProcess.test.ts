@@ -140,4 +140,38 @@ describe("BaseProcess", () => {
     helper(99, one_handler);
     helper(199, two_handler);
   });
+
+  it("should not pause other processes", async () => {
+    const one = Demo(
+      async () => {
+        await pause_stub();
+      },
+      noop,
+      noop
+    );
+    const two = Demo(
+      async () => {
+        await pause_stub();
+      },
+      noop,
+      noop
+    );
+    const one_handler = vi.fn();
+    const two_handler = vi.fn();
+    one.core_msg().subscribe(one_handler);
+    two.core_msg().subscribe(two_handler);
+
+    one.request_pause();
+    setTimeout(one.resume);
+    await Promise.all([one.run(99), two.run(199)]);
+
+    expect(two_handler).not.toBeCalledWith({
+      payload: 199,
+      type: "paused",
+    });
+    expect(one_handler).not.toBeCalledWith({
+      payload: 99,
+      type: "paused",
+    });
+  });
 });
