@@ -9,6 +9,7 @@
   import ProcessAgent from "./ProcessAgent.svelte";
   import { type ProcessState } from "../../use_case/RunningSync";
   import type IProcessHandle from "../../use_case/ProcessHandle";
+  import make_handle from "../adapter/SingleProcessHandleAdapter";
   const note = debug("InSimulation::Main");
 
   export let memory_store: MemorySliceStores = null;
@@ -85,7 +86,7 @@
           bind:selectedPid
           in_region={$is_in_region[pid]}
           procState={$processRunningState[pid]}
-          {ProcessHandle}
+          ProcessHandle={make_handle(pid, ProcessHandle)}
         />
       {/each}
     </div>

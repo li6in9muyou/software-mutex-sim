@@ -48,6 +48,7 @@ export default class StartManyProcesses {
 
   async run_by_pid(pid: number, ...args) {
     await this.create_process_promise;
+    note("start pid %d", pid);
     const ans = await this.processes[pid].run(pid, ...args);
     note("ans %o", ans);
     await Thread.terminate(this.processes[pid]);

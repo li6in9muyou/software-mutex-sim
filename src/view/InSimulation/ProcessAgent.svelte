@@ -1,22 +1,22 @@
 <script lang="ts">
   import { ProcessState } from "../../use_case/RunningSync";
-  import type IProcessHandle from "../../use_case/ProcessHandle";
+  import type { ISingleProcessHandle } from "../../use_case/ProcessHandle";
 
   export let pid: number;
   export let selectedPid: number;
   export let in_region: ProcessState;
   export let procState: ProcessState;
-  export let ProcessHandle: IProcessHandle;
+  export let ProcessHandle: ISingleProcessHandle;
 
   let showPauseSpinner = false;
   function handleToggle() {
     switch (procState) {
       case ProcessState.paused: {
-        ProcessHandle.resume(pid);
+        ProcessHandle.resume();
         break;
       }
       case ProcessState.running: {
-        ProcessHandle.pause(pid);
+        ProcessHandle.pause();
         break;
       }
     }
@@ -46,7 +46,7 @@
     <button
       class:btn-success={procState === ProcessState.ready}
       class="btn btn-sm ml-auto"
-      on:click={() => ProcessHandle.runOne(pid)}
+      on:click={ProcessHandle.run}
     >
       {#if showPauseSpinner}
         <svg

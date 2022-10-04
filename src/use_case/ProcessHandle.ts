@@ -4,3 +4,9 @@ export default interface IProcessHandle {
   resume: (pid: number) => void;
   pause: (pid: number) => void;
 }
+
+export interface ISingleProcessHandle {
+  run: () => void;
+  resume: () => void;
+  pause: () => void;
+}

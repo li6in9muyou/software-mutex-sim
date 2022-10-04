@@ -2,7 +2,7 @@ import {
   onAlgoConfigPage,
   onAlgoSelectionPage,
   onInSimulationPage,
-} from "./model";
+} from "../model";
 import { derived } from "svelte/store";
 
 export default derived(
