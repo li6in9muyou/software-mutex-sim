@@ -114,4 +114,30 @@ describe("BaseProcess", () => {
 
     expect(handler).toBeCalledWith({ type: "completed", payload: 99 });
   });
+
+  it("should not intervene other processes", async () => {
+    const one = Demo(noop, noop, noop);
+    const two = Demo(noop, noop, noop);
+    const one_handler = vi.fn();
+    const two_handler = vi.fn();
+    one.core_msg().subscribe(one_handler);
+    two.core_msg().subscribe(two_handler);
+
+    await one.run(99);
+    await two.run(199);
+
+    const helper = (pid, handler) => {
+      expect(handler).toHaveBeenNthCalledWith(1, {
+        type: "ready",
+        payload: pid,
+      });
+      expect(handler).toHaveBeenLastCalledWith({
+        type: "completed",
+        payload: pid,
+      });
+    };
+
+    helper(99, one_handler);
+    helper(199, two_handler);
+  });
 });
