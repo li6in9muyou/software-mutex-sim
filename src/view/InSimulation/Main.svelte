@@ -1,6 +1,6 @@
 <script lang="ts">
   import { range } from "lodash";
-  import { get, type Readable, type Writable } from "svelte/store";
+  import { derived, get, type Readable, type Writable } from "svelte/store";
   import { router } from "../model";
   import { type MemorySliceStores } from "../../use_case/MemoryWriteSync";
   import debug from "debug";
@@ -10,6 +10,7 @@
   import { type ProcessState } from "../../use_case/RunningSync";
   import type IProcessHandle from "../../use_case/ProcessHandle";
   import make_handle from "../adapter/SingleProcessHandleAdapter";
+  import SourceCodeView from "./SourceCodeView/Main.svelte";
   const note = debug("InSimulation::Main");
 
   export let memory_store: MemorySliceStores = null;
@@ -20,6 +21,7 @@
     lineno: Readable<number[]>;
   } = null;
   export let ProcessHandle: IProcessHandle;
+  export let source_code;
 
   const {
     running: processRunningState,
@@ -35,6 +37,8 @@
       [processRunningState, is_in_region, many_lineno].map((s: any) => get(s))
     );
   });
+
+  $: CurrentProcessLineno = derived(many_lineno, (arr) => arr[selectedPid]);
 
   let allPaused = true;
   function onToggleAllRunOrPause() {
@@ -96,26 +100,7 @@
     <h2 class="mb-2 text-2xl underline">
       source code of process {selectedPid}
     </h2>
-    <ol
-      class="flex max-h-64 flex-col overflow-y-auto rounded bg-base-300 text-primary-content"
-    >
-      {#each range(0, 7) as lineno}
-        {#if lineno === $many_lineno[selectedPid]}
-          <li class="indicator ml-4">
-            <span
-              class="badge indicator-item badge-secondary badge-sm indicator-start indicator-middle"
-            />
-            <div class="px-4">
-              {`${lineno} one two three four five`}
-            </div>
-          </li>
-        {:else}
-          <div class="ml-4 px-3 transition-all duration-300">
-            {`${lineno} one two three four five`}
-          </div>
-        {/if}
-      {/each}
-    </ol>
+    <SourceCodeView lineno={CurrentProcessLineno} {source_code} />
   </section>
   <div class="divider my-0" />
   <section class="flex flex-grow flex-col gap-2">
