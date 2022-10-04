@@ -46,7 +46,7 @@
     <button
       class:btn-success={procState === ProcessState.ready}
       class="btn btn-sm ml-auto"
-      on:click={() => ProcessHandle.run()}
+      on:click={() => ProcessHandle.runOne(pid)}
     >
       {#if showPauseSpinner}
         <svg

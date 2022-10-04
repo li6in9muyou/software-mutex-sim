@@ -1,5 +1,6 @@
 export default interface IProcessHandle {
-  run: () => void;
+  runAll: () => void;
+  runOne: (pid: number) => void;
   resume: (pid: number) => void;
   pause: (pid: number) => void;
 }

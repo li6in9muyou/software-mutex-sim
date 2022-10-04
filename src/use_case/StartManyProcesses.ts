@@ -46,6 +46,14 @@ export default class StartManyProcesses {
     );
   }
 
+  async run_by_pid(pid: number, ...args) {
+    await this.create_process_promise;
+    const ans = await this.processes[pid].run(pid, ...args);
+    note("ans %o", ans);
+    await Thread.terminate(this.processes[pid]);
+    note(`process ${pid} is killed`);
+  }
+
   pause_all() {
     for (const process of this.processes) {
       process.request_pause();

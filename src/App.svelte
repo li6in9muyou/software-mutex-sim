@@ -38,7 +38,9 @@
   const runningSync = new RunningSync(process_count, soa.messages);
 
   const ProcessHandle: IProcessHandle = {
-    run: () => soa.processes_handle.run(memory, process_count),
+    runAll: () => soa.processes_handle.run(memory, process_count),
+    runOne: (pid: number) =>
+      soa.processes_handle.run_by_pid(pid, memory, process_count),
     resume: (pid: number) => soa.processes_handle.resume_by_pid(pid),
     pause: (pid: number) => soa.processes_handle.pause_by_pid(pid),
   };

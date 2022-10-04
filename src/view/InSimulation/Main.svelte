@@ -44,7 +44,7 @@
   function onStartSim() {
     started = true;
     allPaused = false;
-    ProcessHandle.run();
+    ProcessHandle.runAll();
   }
 
   let selectedPid = 0;
