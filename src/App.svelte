@@ -9,6 +9,10 @@
   import RunningSync from "./use_case/RunningSync";
   import { SveltePort } from "./SveltePort";
   import type IProcessHandle from "./use_case/ProcessHandle";
+  import SlidingPages from "./view/SlidingPages.svelte";
+  import AlgorithmSelect from "./view/AlgorithmSelect.svelte";
+  import AlgorithmConfig from "./view/AlgorithmConfig.svelte";
+  import SlidingPagesAdapter from "./view/SlidingPagesAdapter";
   const d = debug(`App`);
 
   const process_count = 4;
@@ -48,4 +52,16 @@
   };
 </script>
 
-<InSimulation {per_process_state} {memory_store} {ProcessHandle} />
+<div class="w-full overflow-x-hidden">
+  <SlidingPages offset={$SlidingPagesAdapter}>
+    <slot slot="left">
+      <AlgorithmSelect />
+    </slot>
+    <slot slot="middle">
+      <AlgorithmConfig />
+    </slot>
+    <slot slot="right">
+      <InSimulation {per_process_state} {memory_store} {ProcessHandle} />
+    </slot>
+  </SlidingPages>
+</div>

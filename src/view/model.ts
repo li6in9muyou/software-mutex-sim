@@ -1,7 +1,7 @@
 import { derived, get, writable } from "svelte/store";
 import { isEmpty } from "lodash";
 
-type Pages = "AlgoSelection" | "AlgoConfig" | "InSimulation";
+export type Pages = "AlgoSelection" | "AlgoConfig" | "InSimulation";
 
 export const CurrentPage = writable<Pages>("AlgoSelection");
 
