@@ -23,7 +23,6 @@ async function lock(use_msg, pid, memory, process_count) {
   const { flag, label } = useMonitoredMemory(mPipe, memory);
   dbg.next("memory", flag, label);
 
-  await break_point(0);
   flag[pid] = TRUE;
   await break_point(1);
   label[pid] = max(label) + 1;
@@ -31,7 +30,6 @@ async function lock(use_msg, pid, memory, process_count) {
   await break_point(3);
   do {} while (should_wait(pid, label, flag));
   await break_point(4);
-  await break_point(5);
 }
 
 async function unlock(use_msgs, who, memory) {
@@ -39,9 +37,9 @@ async function unlock(use_msgs, who, memory) {
 
   await pause_stub();
   const { flag } = useMonitoredMemory(mPipe, memory);
-  await break_point(6);
+
   flag[who] = FALSE;
-  await break_point(7);
+  await break_point(5);
 
   dbg.next("unlock");
   await pause_stub();
