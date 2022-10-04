@@ -42,7 +42,9 @@
     runOne: (pid: number) =>
       soa.processes_handle.run_by_pid(pid, memory, process_count),
     resume: (pid: number) => soa.processes_handle.resume_by_pid(pid),
+    resumeAll: () => soa.processes_handle.resume_all(),
     pause: (pid: number) => soa.processes_handle.pause_by_pid(pid),
+    pauseAll: () => soa.processes_handle.pause_all(),
   };
 
   const [is_in_region, ,] = con.get_stores_overview_contending_acquired();

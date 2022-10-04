@@ -42,6 +42,11 @@
 
   let allPaused = true;
   function onToggleAllRunOrPause() {
+    if (allPaused) {
+      ProcessHandle.resumeAll();
+    } else {
+      ProcessHandle.pauseAll();
+    }
     allPaused = !allPaused;
   }
 
