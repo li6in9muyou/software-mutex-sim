@@ -13,10 +13,10 @@ describe("RunningSync", () => {
     source = new Subject();
   });
 
-  it("should init every running to paused", () => {
+  it("should init every running to ready", () => {
     const rs = new RunningSync(3, Observable.from(source));
     expect(rs).toBeTruthy();
-    expect(get(rs.running)).toEqual(times(3, constant(ProcessState.paused)));
+    expect(get(rs.running)).toEqual(times(3, constant(ProcessState.ready)));
   });
 
   it("should update running state", () => {
