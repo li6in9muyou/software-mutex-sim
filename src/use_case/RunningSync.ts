@@ -63,30 +63,12 @@ export default class RunningSync {
         });
         break;
       }
+      case "paused":
+      case "running":
+      case "completed":
       case "ready": {
         this._running.update((arr) => {
-          arr[ev.payload] = ProcessState.ready;
-          return arr;
-        });
-        break;
-      }
-      case "paused": {
-        this._running.update((arr) => {
-          arr[ev.payload] = ProcessState.paused;
-          return arr;
-        });
-        break;
-      }
-      case "running": {
-        this._running.update((arr) => {
-          arr[ev.payload] = ProcessState.running;
-          return arr;
-        });
-        break;
-      }
-      case "completed": {
-        this._running.update((arr) => {
-          arr[ev.payload] = ProcessState.completed;
+          arr[ev.payload] = ProcessState[ev.type];
           return arr;
         });
         break;
