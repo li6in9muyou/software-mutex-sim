@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ProcessState } from "../../use_case/RunningSync";
-  import { type IProcessHandle } from "../../use_case/ProcessHandle";
+  import type IProcessHandle from "../../use_case/ProcessHandle";
 
   export let pid: number;
   export let selectedPid: number;
