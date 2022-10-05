@@ -1,22 +1,20 @@
 <script lang="ts">
-  import { find, isNull, join, times } from "lodash";
+  import { find, join, times } from "lodash";
   import { router } from "./model";
   import type IStaticAlgorithmDescription from "../algorithms/IStaticAlgorithmDescription";
+  import { CurrentSelectedAlgorithm } from "./algorithm_config";
+  import { get } from "svelte/store";
 
-  export let selectedAlgorithm;
   export let options: IStaticAlgorithmDescription[] = [];
 
-  let sName = selectedAlgorithm?.name;
-  let description = "";
-  $: if (!isNull(sName)) {
-    description =
-      selectedAlgorithm?.description ??
-      join(
-        times(10, () => sName),
-        ", "
-      );
-  }
-  $: selectedAlgorithm = find(options, (op) => op.name === sName);
+  let sName = get(CurrentSelectedAlgorithm)?.name;
+  $: CurrentSelectedAlgorithm.set(find(options, (op) => op.name === sName));
+  $: description =
+    $CurrentSelectedAlgorithm?.description ??
+    join(
+      times(10, () => sName),
+      ", "
+    );
 </script>
 
 <div class="navbar mb-2 rounded bg-base-200 shadow-xl">

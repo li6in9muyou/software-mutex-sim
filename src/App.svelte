@@ -58,24 +58,28 @@
   };
 
   const availableAlgorithms = [
-    { name: "crap senior", memory_transform: identity },
-    { name: "crap junior", memory_transform: identity },
+    { name: "crap senior", memory_transform: identity, max_process_count: 2 },
+    { name: "crap junior", memory_transform: identity, max_process_count: 9 },
     Lamport,
   ];
-  let selectedAlgorithm = null; //head(availableAlgorithms);
-  $: CurrentSelectedAlgorithm.set(selectedAlgorithm);
+  CurrentSelectedAlgorithm.set(head(availableAlgorithms));
 </script>
 
 <div class="w-full overflow-x-hidden">
   <SlidingPages offset={$SlidingPagesAdapter}>
     <slot slot="left">
-      <AlgorithmSelect />
+      <AlgorithmSelect options={availableAlgorithms} />
     </slot>
     <slot slot="middle">
       <AlgorithmConfig />
     </slot>
     <slot slot="right">
-      <InSimulation {per_process_state} {memory_store} {ProcessHandle} />
+      <InSimulation
+        {per_process_state}
+        {memory_store}
+        {ProcessHandle}
+        {source_code}
+      />
     </slot>
   </SlidingPages>
 </div>
