@@ -1,9 +1,11 @@
 import { expose } from "threads";
-import { break_point, Demo, pause_stub } from "../../use_case/BaseProcess";
+import ImportBaseProcessModule from "../../use_case/BaseProcess";
 import { Idle } from "../../utility";
 import { max } from "lodash";
 import { FALSE, TRUE } from "./constants";
 import { useMonitoredMemory } from "../../use_case/MemoryWriteSync";
+
+const { Demo, break_point, pause_stub } = ImportBaseProcessModule();
 
 function should_wait(who: number, ...memory: Int32Array[]): boolean {
   const [label, flag] = memory;

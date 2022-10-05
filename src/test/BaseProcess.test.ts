@@ -1,9 +1,10 @@
 import { noop } from "lodash";
 import { vi, it, describe, expect } from "vitest";
-import { break_point, Demo, pause_stub } from "../use_case/BaseProcess";
+import ImportBaseProcessModule from "../use_case/BaseProcess";
 
 describe("BaseProcess", () => {
   it("should emit pre and post event", () => {
+    const Demo = ImportBaseProcessModule().Demo;
     const d = Demo(noop, noop, noop);
     const coreMsg = d.core_msg();
     const handler = vi.fn();
@@ -15,6 +16,7 @@ describe("BaseProcess", () => {
   });
 
   it("should pause and resume", async () => {
+    const { Demo, pause_stub } = ImportBaseProcessModule();
     const d = Demo(
       async () => {
         await pause_stub();
@@ -37,6 +39,7 @@ describe("BaseProcess", () => {
   });
 
   it("should pause at every breakpoint", async () => {
+    const { Demo, break_point } = ImportBaseProcessModule();
     const d = Demo(
       async () => {
         await break_point(1, "first");
@@ -67,6 +70,7 @@ describe("BaseProcess", () => {
   });
 
   it("should default to not pausing at every breakpoint", async () => {
+    const { Demo, break_point } = ImportBaseProcessModule();
     const d = Demo(
       async () => {
         await break_point(1);
@@ -81,32 +85,39 @@ describe("BaseProcess", () => {
   });
 
   it("should reset breakpoint settings after each run", async () => {
-    const d = Demo(
-      async () => {
-        await break_point(1);
-      },
-      noop,
-      noop
-    );
+    let d;
+    {
+      const { Demo, break_point } = ImportBaseProcessModule();
+      d = Demo(
+        async () => {
+          await break_point(1);
+        },
+        noop,
+        noop
+      );
+    }
     const handler = vi.fn();
     d.core_msg().subscribe(handler);
 
     d.enable_breakpoints();
     setTimeout(d.resume);
     await d.run(99);
-
-    const d2 = Demo(
-      async () => {
-        await break_point(1);
-      },
-      noop,
-      noop
-    );
+    let d2;
+    {
+      const { Demo, break_point } = ImportBaseProcessModule();
+      d2 = Demo(
+        async () => {
+          await break_point(1);
+        },
+        noop,
+        noop
+      );
+    }
     await d2.run(99);
   });
 
   it("should signal completion", async () => {
-    const d = Demo(noop, noop, noop);
+    const d = ImportBaseProcessModule().Demo(noop, noop, noop);
     const handler = vi.fn();
     d.core_msg().subscribe(handler);
 
@@ -116,8 +127,8 @@ describe("BaseProcess", () => {
   });
 
   it("should not send messages to other process's subscriber", async () => {
-    const one = Demo(noop, noop, noop);
-    const two = Demo(noop, noop, noop);
+    const one = ImportBaseProcessModule().Demo(noop, noop, noop);
+    const two = ImportBaseProcessModule().Demo(noop, noop, noop);
     const one_handler = vi.fn();
     const two_handler = vi.fn();
     one.core_msg().subscribe(one_handler);
@@ -155,20 +166,29 @@ describe("BaseProcess", () => {
   });
 
   it("should not pause other processes", async () => {
-    const one = Demo(
-      async () => {
-        await pause_stub();
-      },
-      noop,
-      noop
-    );
-    const two = Demo(
-      async () => {
-        await pause_stub();
-      },
-      noop,
-      noop
-    );
+    let one;
+    {
+      const { Demo, pause_stub } = ImportBaseProcessModule();
+      one = Demo(
+        async () => {
+          await pause_stub();
+        },
+        noop,
+        noop
+      );
+    }
+    let two;
+    {
+      const { Demo, pause_stub } = ImportBaseProcessModule();
+      two = Demo(
+        async () => {
+          await pause_stub();
+        },
+        noop,
+        noop
+      );
+    }
+
     const one_handler = vi.fn();
     const two_handler = vi.fn();
     one.core_msg().subscribe(one_handler);
@@ -178,11 +198,11 @@ describe("BaseProcess", () => {
     setTimeout(one.resume);
     await Promise.all([one.run(99), two.run(199)]);
 
-    expect(two_handler).not.toBeCalledWith({
+    expect(one_handler).not.toBeCalledWith({
       payload: 199,
       type: "paused",
     });
-    expect(one_handler).not.toBeCalledWith({
+    expect(two_handler).not.toBeCalledWith({
       payload: 99,
       type: "paused",
     });
