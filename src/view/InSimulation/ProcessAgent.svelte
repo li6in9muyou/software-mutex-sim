@@ -42,9 +42,10 @@
     {`${procStateDisplay.get(procState)} pid ${pid} ` +
       `is ${in_region ? "in" : "not in "} critical region`}
   </div>
-  {#if procState === ProcessState.ready}
+  {#if procState === ProcessState.ready || procState === ProcessState.completed}
     <button
-      class:btn-success={procState === ProcessState.ready}
+      class:btn-success={procState === ProcessState.ready ||
+        procState === ProcessState.completed}
       class="btn btn-sm ml-auto"
       on:click={ProcessHandle.run}
     >
@@ -77,7 +78,6 @@
       class:btn-disabled={pid !== selectedPid}
       class:btn-warning={procState === ProcessState.running}
       class:btn-success={procState === ProcessState.paused}
-      class:btn-disable={procState === ProcessState.completed}
       class="btn btn-sm ml-auto"
       on:click={handleToggle}
     >

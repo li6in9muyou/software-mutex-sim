@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { range } from "lodash";
+  import { every, range } from "lodash";
   import { derived, get, type Readable, type Writable } from "svelte/store";
   import { router } from "../model";
   import { type MemorySliceStores } from "../../use_case/MemoryWriteSync";
@@ -7,7 +7,7 @@
   import { onMount } from "svelte";
   import Memory from "./Memory.svelte";
   import ProcessAgent from "./ProcessAgent.svelte";
-  import { type ProcessState } from "../../use_case/RunningSync";
+  import { ProcessState } from "../../use_case/RunningSync";
   import type IProcessHandle from "../../use_case/ProcessHandle";
   import make_handle from "../adapter/SingleProcessHandleAdapter";
   import SourceCodeView from "./SourceCodeView/Main.svelte";
@@ -57,6 +57,9 @@
     ProcessHandle.runAll();
   }
 
+  const allCompleted = derived(processRunningState, (arr) =>
+    every(arr, (s) => s === ProcessState.completed)
+  );
   let selectedPid = 0;
 </script>
 
@@ -65,7 +68,7 @@
     <a class="btn" on:click={() => router.pop()}>back</a>
   </div>
   <div class="navbar-end gap-2">
-    {#if started}
+    {#if started && !$allCompleted}
       <a
         class="btn btn-warning"
         class:btn-disabled={allPaused}
@@ -79,7 +82,8 @@
         on:click={onToggleAllRunOrPause}
       >
         resume all
-      </a>{:else}
+      </a>
+    {:else}
       <button class="btn btn-success" on:click={onStartSim}> start </button>
     {/if}
   </div>
