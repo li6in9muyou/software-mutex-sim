@@ -1,3 +1,3 @@
-<section class="w-full p-2">
+<section class="w-screen p-2">
   <slot />
 </section>
