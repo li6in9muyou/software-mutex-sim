@@ -11,8 +11,10 @@
   import type IProcessHandle from "./use_case/ProcessHandle";
   import SlidingPages from "./view/SlidingPages.svelte";
   import AlgorithmSelect from "./view/AlgorithmSelect.svelte";
-  import AlgorithmConfig from "./view/AlgorithmConfig.svelte";
-  import SlidingPagesAdapter from "./view/SlidingPagesAdapter";
+  import { Lamport } from "./algorithms/Lamport/constants";
+  import { CurrentSelectedAlgorithm } from "./view/algorithm_config";
+  import { head, identity } from "lodash";
+  import type IStaticAlgorithmDescription from "./algorithms/IStaticAlgorithmDescription";
   const d = debug(`App`);
 
   const process_count = 4;
@@ -54,6 +56,14 @@
     in_critical_region_or_not: is_in_region,
     lineno: runningSync.lineno,
   };
+
+  const availableAlgorithms = [
+    { name: "crap senior", memory_transform: identity },
+    { name: "crap junior", memory_transform: identity },
+    Lamport,
+  ];
+  let selectedAlgorithm = null; //head(availableAlgorithms);
+  $: CurrentSelectedAlgorithm.set(selectedAlgorithm);
 </script>
 
 <div class="w-full overflow-x-hidden">
