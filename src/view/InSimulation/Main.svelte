@@ -65,24 +65,24 @@
 
 <div class="navbar mb-2 rounded bg-base-200 shadow-xl">
   <div class="navbar-start">
-    <a class="btn" on:click={() => router.pop()}>back</a>
+    <div class="btn" on:click={() => router.pop()}>back</div>
   </div>
   <div class="navbar-end gap-2">
     {#if started && !$allCompleted}
-      <a
+      <div
         class="btn btn-warning"
         class:btn-disabled={allPaused}
         on:click={onToggleAllRunOrPause}
       >
         pause all
-      </a>
-      <a
+      </div>
+      <div
         class="btn btn-success"
         class:btn-disabled={!allPaused}
         on:click={onToggleAllRunOrPause}
       >
         resume all
-      </a>
+      </div>
     {:else}
       <button class="btn btn-success" on:click={onStartSim}> start </button>
     {/if}
