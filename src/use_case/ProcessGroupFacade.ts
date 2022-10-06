@@ -47,19 +47,16 @@ export default class ProcessGroup implements IProcessGroup {
     this.sb.soa.processes_handle.kill_all();
   }
 
-  async_wrap = (fn) => {
-    const f = fn.bind(this);
-    return () => {
-      f();
-      return Promise.resolve();
-    };
+  async_wrap = (fn) => () => {
+    fn();
+    return Promise.resolve();
   };
 
   private _all = {
-    start: this.async_wrap(this.runAll),
-    resume: this.async_wrap(this.resumeAll),
-    pause: this.async_wrap(this.pauseAll),
-    kill: this.async_wrap(this.killAll),
+    start: this.async_wrap(this.runAll.bind(this)),
+    resume: this.async_wrap(this.resumeAll.bind(this)),
+    pause: this.async_wrap(this.pauseAll.bind(this)),
+    kill: this.async_wrap(this.killAll.bind(this)),
   };
 
   get all(): IProcess {
@@ -67,12 +64,12 @@ export default class ProcessGroup implements IProcessGroup {
   }
 
   pid(pid: number): IProcess {
-    const { start, resume, pause, kill } = this.get_pid(pid);
+    const p = this.get_pid(pid);
     return {
-      start: this.async_wrap(start),
-      resume: this.async_wrap(resume),
-      pause: this.async_wrap(pause),
-      kill: this.async_wrap(kill),
+      start: this.async_wrap(p.start.bind(p)),
+      resume: this.async_wrap(p.resume.bind(p)),
+      pause: this.async_wrap(p.pause.bind(p)),
+      kill: this.async_wrap(p.kill.bind(p)),
     };
   }
 }
