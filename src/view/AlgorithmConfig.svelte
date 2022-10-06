@@ -4,6 +4,7 @@
   import { range } from "lodash";
 
   $: maxCount = Math.min($CurrentSelectedAlgorithm?.max_process_count ?? 13);
+  $: ProcessCount.set(Math.min(maxCount, $ProcessCount));
   $: step = Math.floor((maxCount - 1) / 4);
 </script>
 
