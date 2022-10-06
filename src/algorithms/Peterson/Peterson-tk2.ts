@@ -49,7 +49,7 @@ async function unlock(use_msgs, who, memory) {
   await break_point(7);
   level[who] = 0;
   dbg.next("unlock");
-  await break_point(101);
+  await break_point(102);
 }
 
 expose(Demo(lock, unlock, Idle));
