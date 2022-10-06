@@ -18,7 +18,7 @@ describe("ContendingOrNot", () => {
   });
 
   it("should have an attach methods that accepts an Observable", () => {
-    const con = new ContendingOrNot("Testing", port);
+    const con = new ContendingOrNot(port);
 
     con.attach(Observable.from(source));
 
@@ -29,7 +29,7 @@ describe("ContendingOrNot", () => {
   });
 
   it("should provides an event handler", () => {
-    const con = new ContendingOrNot("Testing", port);
+    const con = new ContendingOrNot(port);
 
     source.subscribe(con.core_message_handler);
 
@@ -40,7 +40,7 @@ describe("ContendingOrNot", () => {
   });
 
   it("should not throw if source emits unexpected event", () => {
-    const con = new ContendingOrNot("Testing", port);
+    const con = new ContendingOrNot(port);
 
     con.attach(Observable.from(source));
     source.subscribe(con.core_message_handler);
