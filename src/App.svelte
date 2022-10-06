@@ -6,9 +6,9 @@
   import AlgorithmConfig from "./view/AlgorithmConfig.svelte";
   import SlidingPages from "./view/SlidingPages.svelte";
   import SlidingPagesAdapter from "./view/adapter/SlidingPagesAdapter.js";
-  import Lamport from "./algorithms/Lamport/AlgorithmDescription";
+  import AlgorithmTable from "./algorithms/AlgorithmTable";
 
-  const availableAlgorithms = [Lamport];
+  const availableAlgorithms = Array.from(AlgorithmTable.values());
   StaticDescription.set(head(availableAlgorithms));
 </script>
 
