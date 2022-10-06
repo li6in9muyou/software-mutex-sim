@@ -47,9 +47,12 @@ export default class ProcessGroup implements IProcessGroup {
     this.sb.soa.processes_handle.kill_all();
   }
 
-  async_wrap = (fn) => () => {
-    fn();
-    return Promise.resolve();
+  async_wrap = (fn) => {
+    const f = fn.bind(this);
+    return () => {
+      f();
+      return Promise.resolve();
+    };
   };
 
   private _all = {
