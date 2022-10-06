@@ -1,12 +1,12 @@
 <script lang="ts">
   import { ProcessState } from "../../use_case/RunningSync";
-  import Process from "../../use_case/ProcessFacade";
+  import type IProcess from "../../use_case/IProcess";
 
   export let pid: number = null;
   export let selectedPid: number = null;
   export let in_region: ProcessState = null;
   export let procState: ProcessState = null;
-  export let ProcessHandle: Process = null;
+  export let ProcessHandle: IProcess = null;
 
   let showPauseSpinner = false;
   function handleToggle() {

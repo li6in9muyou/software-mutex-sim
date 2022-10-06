@@ -1,7 +1,9 @@
 import type SimulationBuilder from "./SimulationBuilder";
 import Process from "./ProcessFacade";
+import type IProcess from "./IProcess";
+import type IProcessGroup from "./IProcessGroup";
 
-export default class ProcessGroup {
+export default class ProcessGroup implements IProcessGroup {
   static GetMany(sb: SimulationBuilder): ProcessGroup {
     return new ProcessGroup(sb);
   }
@@ -43,5 +45,31 @@ export default class ProcessGroup {
 
   killAll() {
     this.sb.soa.processes_handle.kill_all();
+  }
+
+  async_wrap = (fn) => () => {
+    fn();
+    return Promise.resolve();
+  };
+
+  private _all = {
+    start: this.async_wrap(this.runAll),
+    resume: this.async_wrap(this.resumeAll),
+    pause: this.async_wrap(this.pauseAll),
+    kill: this.async_wrap(this.killAll),
+  };
+
+  get all(): IProcess {
+    return this._all;
+  }
+
+  pid(pid: number): IProcess {
+    const { start, resume, pause, kill } = this.get_pid(pid);
+    return {
+      start: this.async_wrap(start),
+      resume: this.async_wrap(resume),
+      pause: this.async_wrap(pause),
+      kill: this.async_wrap(kill),
+    };
   }
 }

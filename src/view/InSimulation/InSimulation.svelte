@@ -14,13 +14,13 @@
   const note = debug("InSimulation::Main");
 
   const process_count: number = $CurrentSelectedAlgorithm.process_count;
-  const ProcessHandle: ProcessGroup = ProcessGroup.GetMany(
+  const manyProcess: ProcessGroup = ProcessGroup.GetMany(
     new SimulationBuilder($CurrentSelectedAlgorithm)
   );
-  const memory_store = ProcessHandle.get_store("Memory");
-  const processRunningState = ProcessHandle.get_store("LifeCycle");
-  const is_in_region = ProcessHandle.get_store("WhoIsIn");
-  const many_lineno = ProcessHandle.get_store("LineNumber");
+  const memory_store = manyProcess.get_store("Memory");
+  const processRunningState = manyProcess.get_store("LifeCycle");
+  const is_in_region = manyProcess.get_store("WhoIsIn");
+  const many_lineno = manyProcess.get_store("LineNumber");
 
   onMount(() => {
     note("begin!");
@@ -32,7 +32,7 @@
 
   onDestroy(() => {
     note("finish!");
-    ProcessHandle.killAll();
+    manyProcess.all.kill();
   });
 
   $: CurrentProcessLineno = derived(many_lineno, (arr) => arr[selectedPid]);
@@ -40,9 +40,9 @@
   let allPaused = true;
   function onToggleAllRunOrPause() {
     if (allPaused) {
-      ProcessHandle.resumeAll();
+      manyProcess.all.resume();
     } else {
-      ProcessHandle.pauseAll();
+      manyProcess.all.pause();
     }
     allPaused = !allPaused;
   }
@@ -51,7 +51,7 @@
   function onStartSim() {
     started = true;
     allPaused = false;
-    ProcessHandle.runAll();
+    manyProcess.all.start();
   }
 
   const allCompleted = derived(processRunningState, (arr) =>
@@ -96,7 +96,7 @@
           bind:selectedPid
           in_region={$is_in_region[pid]}
           procState={$processRunningState[pid]}
-          ProcessHandle={ProcessHandle.get_pid(pid)}
+          ProcessHandle={manyProcess.pid(pid)}
         />
       {/each}
     </div>
