@@ -40,7 +40,7 @@
   </select>
 
   <div class="divider" />
-  <div class="text-xl">
+  <div class="whitespace-pre-wrap text-xl">
     {description}
   </div>
 </main>

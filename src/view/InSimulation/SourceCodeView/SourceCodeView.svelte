@@ -9,7 +9,7 @@
   if (isNull(source_code) || isEmpty(source_code)) {
     throw new Error("empty source code");
   }
-  const line_style = "min-h-6 font-mono h-fit whitespace-nowrap";
+  const line_style = "min-h-6 font-mono h-fit whitespace-nowrap whitespace-pre";
 </script>
 
 <ol
