@@ -109,9 +109,7 @@
     <SourceCodeView lineno={CurrentProcessLineno} />
   </section>
   <div class="divider my-0" />
-  <section class="flex flex-grow flex-col gap-2">
-    <slot>
-      <Memory stores={memory_store} />
-    </slot>
-  </section>
+  <slot>
+    <Memory stores={memory_store} />
+  </slot>
 </main>
