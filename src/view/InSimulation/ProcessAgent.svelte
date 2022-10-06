@@ -4,7 +4,7 @@
 
   export let pid: number = null;
   export let selectedPid: number = null;
-  export let in_region: ProcessState = null;
+  export let in_region: boolean = null;
   export let procState: ProcessState = null;
   export let ProcessHandle: IProcess = null;
 
