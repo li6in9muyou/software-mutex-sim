@@ -11,18 +11,12 @@
   import SlidingPages from "./view/SlidingPages.svelte";
   import SlidingPagesAdapter from "./view/adapter/SlidingPagesAdapter.js";
   import SimulationBuilder from "./use_case/SimulationBuilder";
+  import ProcessGroup from "./use_case/ProcessGroupFacade";
 
-  let sb, stores, per_process_state, memory_store, ProcessHandle, source_code;
+  let sb, ProcessHandle;
   $: if ($CurrentSelectedAlgorithm) {
     sb = new SimulationBuilder($CurrentSelectedAlgorithm);
-    stores = sb.get_stores();
-    per_process_state = {
-      process_count: $CurrentSelectedAlgorithm.process_count,
-      ...stores,
-    };
-    memory_store = stores.memory_store;
-    ProcessHandle = sb.get_process_handle();
-    source_code = $CurrentSelectedAlgorithm.source_code;
+    ProcessHandle = ProcessGroup.GetMany(sb);
   }
   const availableAlgorithms = [Lamport];
   StaticDescription.set(head(availableAlgorithms));
@@ -37,12 +31,7 @@
       <AlgorithmConfig />
     </slot>
     <slot slot="right">
-      <InSimulation
-        {per_process_state}
-        {memory_store}
-        {ProcessHandle}
-        {source_code}
-      />
+      <InSimulation {ProcessHandle} />
     </slot>
   </SlidingPages>
 </div>

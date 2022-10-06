@@ -1,9 +1,11 @@
 <script lang="ts">
   import { type Readable } from "svelte/store";
   import { isEmpty, isNull } from "lodash";
+  import { CurrentSelectedAlgorithm } from "../../algorithm_config";
 
   export let lineno: Readable<number> = null;
-  export let source_code: [number, string][] = null;
+
+  let source_code = $CurrentSelectedAlgorithm.source_code;
   if (isNull(source_code) || isEmpty(source_code)) {
     throw new Error("empty source code");
   }

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { every, range } from "lodash";
-  import { derived, get, type Readable, type Writable } from "svelte/store";
+  import { derived, get, type Writable, type Readable } from "svelte/store";
   import { router } from "../model";
   import { type MemorySliceStores } from "../../use_case/MemoryWriteSync";
   import debug from "debug";
@@ -8,27 +8,19 @@
   import Memory from "./Memory.svelte";
   import ProcessAgent from "./ProcessAgent.svelte";
   import { ProcessState } from "../../use_case/RunningSync";
-  import type IProcessHandle from "../../use_case/ProcessHandle";
-  import make_handle from "../adapter/SingleProcessHandleAdapter";
   import SourceCodeView from "./SourceCodeView/SourceCodeView.svelte";
+  import ProcessGroup from "../../use_case/ProcessGroupFacade";
+  import { CurrentSelectedAlgorithm } from "../algorithm_config";
   const note = debug("InSimulation::Main");
 
-  export let memory_store: MemorySliceStores = null;
-  export let per_process_state: {
-    process_count: number;
-    running: Writable<ProcessState[]>;
-    in_critical_region_or_not: Readable<boolean[]>;
-    lineno: Readable<number[]>;
-  } = null;
-  export let ProcessHandle: IProcessHandle;
-  export let source_code;
+  export let ProcessHandle: ProcessGroup;
 
-  const {
-    running: processRunningState,
-    in_critical_region_or_not: is_in_region,
-    lineno: many_lineno,
-    process_count,
-  } = per_process_state;
+  const memory_store: MemorySliceStores = ProcessHandle.get_store("Memory");
+  const processRunningState: Writable<ProcessState[]> =
+    ProcessHandle.get_store("LifeCycle");
+  const is_in_region: Readable<boolean[]> = ProcessHandle.get_store("WhoIsIn");
+  const many_lineno: Readable<number[]> = ProcessHandle.get_store("LineNumber");
+  const process_count: number = $CurrentSelectedAlgorithm.process_count;
 
   onMount(() => {
     note("begin!");
@@ -99,7 +91,7 @@
           bind:selectedPid
           in_region={$is_in_region[pid]}
           procState={$processRunningState[pid]}
-          ProcessHandle={make_handle(pid, ProcessHandle)}
+          ProcessHandle={ProcessHandle.get_pid(pid)}
         />
       {/each}
     </div>
@@ -109,7 +101,7 @@
     <h2 class="mb-2 text-2xl underline">
       source code of process {selectedPid}
     </h2>
-    <SourceCodeView lineno={CurrentProcessLineno} {source_code} />
+    <SourceCodeView lineno={CurrentProcessLineno} />
   </section>
   <div class="divider my-0" />
   <section class="flex flex-grow flex-col gap-2">

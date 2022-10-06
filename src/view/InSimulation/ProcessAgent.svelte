@@ -1,12 +1,12 @@
 <script lang="ts">
   import { ProcessState } from "../../use_case/RunningSync";
-  import type { ISingleProcessHandle } from "../../use_case/ProcessHandle";
+  import Process from "../../use_case/ProcessFacade";
 
   export let pid: number = null;
   export let selectedPid: number = null;
   export let in_region: ProcessState = null;
   export let procState: ProcessState = null;
-  export let ProcessHandle: ISingleProcessHandle = null;
+  export let ProcessHandle: Process = null;
 
   let showPauseSpinner = false;
   function handleToggle() {
@@ -52,7 +52,7 @@
     {#if isIdle}
       <button
         class="btn btn-success btn-sm ml-auto"
-        on:click={ProcessHandle.run}
+        on:click={() => ProcessHandle.start()}
       >
         {#if showPauseSpinner}
           <svg
