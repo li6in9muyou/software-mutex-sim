@@ -1,8 +1,9 @@
 import { expose } from "threads";
-import { Demo, pause_stub } from "../../use_case/BaseProcess";
+const { Demo, break_point } = ImportBaseProcessModule();
 import { Idle, Yield } from "../../utility";
 import { identity } from "lodash";
 import { useMonitoredMemory } from "../../use_case/MemoryWriteSync";
+import ImportBaseProcessModule from "../../use_case/BaseProcess";
 
 function can_proceed(me, waiting_room_idx, l, v) {
   const at_highest_level = l
@@ -21,24 +22,34 @@ async function lock(use_msg, pid, memory, process_count) {
   dbg.next("memory", level, victim);
 
   for (let i = 1; i < process_count; i++) {
+    await break_point(1);
+
+    await break_point(2);
     level[pid] = i;
-    await pause_stub();
+
+    await break_point(3);
     victim[i] = pid;
-    await pause_stub();
+
+    await break_point(4);
     do {
-      await pause_stub();
+      await break_point(100);
       await Yield();
     } while (!can_proceed(pid, i, level, victim));
+
+    await break_point(5);
     await Yield();
   }
+  await break_point(6);
+  await break_point(101);
 }
 
 async function unlock(use_msgs, who, memory) {
-  await pause_stub();
   const [dbg, , mPipe] = use_msgs();
   const { level } = useMonitoredMemory(mPipe, memory);
+  await break_point(7);
   level[who] = 0;
   dbg.next("unlock");
+  await break_point(101);
 }
 
 expose(Demo(lock, unlock, Idle));

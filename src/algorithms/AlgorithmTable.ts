@@ -1,2 +1,7 @@
 import Lamport from "./Lamport/AlgorithmDescription";
-export default new Map([["Lamport's Algorithm", Lamport]]);
+import Peterson from "./Peterson/AlgorithmDescription";
+
+export default new Map([
+  ["Lamport's Algorithm", Lamport],
+  ["Peterson's Algorithm", Peterson],
+]);
