@@ -1,0 +1,7 @@
+Dekker's algorithm is the first known correct solution to the mutual exclusion problem in concurrent programming where processes only communicate via shared memory. The solution is attributed to Dutch mathematician Th. J. Dekker by Edsger W. Dijkstra in an unpublished paper on sequential process descriptions and his manuscript on cooperating sequential processes. It allows two threads to share a single-use resource without conflict, using only shared memory for communication.
+
+Dekker 算法是并发编程中互斥问题的第一个已知正确解决方案，其中进程仅通过共享内存进行通信。该解决方案归功于荷兰数学家Th。 Edsger W. Dijkstra 的 J. Dekker 在一篇关于顺序过程描述的未发表论文和他关于协作顺序过程的手稿中。它允许两个线程共享一个一次性资源而不会发生冲突，只使用共享内存进行通信。
+
+It avoids the strict alternation of a naïve turn-taking algorithm, and was one of the first mutual exclusion algorithms to be invented.
+
+它避免了天真的轮流算法的严格交替，并且是最早发明的互斥算法之一。
