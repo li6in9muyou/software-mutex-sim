@@ -1,5 +1,5 @@
 import ContendingOrNot from "../port/ContendingOrNot";
-import { SveltePort } from "../SveltePort";
+import { SveltePort } from "../port/SveltePort";
 import SingleObservableAdapter from "./SingleObservableAdapter";
 import { createMemorySyncStoreAndSync, type IMemory } from "./MemoryWriteSync";
 import RunningSync from "./RunningSync";

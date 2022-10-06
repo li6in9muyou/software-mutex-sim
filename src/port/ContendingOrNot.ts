@@ -1,4 +1,4 @@
-import type { SveltePort } from "../SveltePort";
+import type { SveltePort } from "./SveltePort";
 import debug from "debug";
 import type { Readable } from "svelte/store";
 import { isArray } from "lodash";

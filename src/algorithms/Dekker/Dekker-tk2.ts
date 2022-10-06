@@ -1,6 +1,6 @@
 import { expose } from "threads";
 import ImportBaseProcessModule from "../../use_case/BaseProcess";
-import { Idle, Yield } from "../../utility";
+import { Idle, Yield } from "../utility";
 import { FALSE, TRUE } from "./constants";
 import { useMonitoredMemory } from "../../use_case/MemoryWriteSync";
 const { Demo, break_point } = ImportBaseProcessModule();

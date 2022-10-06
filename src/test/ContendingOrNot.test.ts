@@ -3,7 +3,7 @@ import { Observable, Subject } from "threads/observable";
 import ContendingOrNot, {
   type ContendingOrNotEvent,
 } from "../port/ContendingOrNot";
-import type { SveltePort } from "../SveltePort";
+import type { SveltePort } from "../port/SveltePort";
 
 describe("ContendingOrNot", () => {
   let source: Subject<ContendingOrNotEvent>;
