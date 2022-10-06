@@ -1,0 +1,19 @@
+An N-Process Solution: Eisenberg and McGuire's Algorithm
+
+This is a correct solution for the N-process case developed by Eisenberg and McGuire. Earlier solutions had been proposed by Dijkstra, Knuth, and DeBruijn. This solution improves on the previous ones by reducing the bound on how many turns a process may have to wait to the minimum possible, n-1.
+
+CONCEPT: The turn variable and status flags are used as in Dekker's algorithm for the 2-process case. The flags now have three possible values: WAITING for a process in the entry protocol, waiting for the resource' ACTIVE for a process in the critical section, using the resource; and IDLE for other cases.
+
+Process priority is maintained in circular order beginning with the one holding the turn. Each process begins the entry protocol by scanning all processes from the one with the turn up to itself. These are the only processes that might have to go first if there is competition.
+
+If the scan finds all processes idle, the process advances tentatively to the ACTIVE state. However, it is still possible that another process which started scanning later but belongs before us will also reach this state. We check one more time to be sure there are no active processes.
+
+N 过程解决方案：Eisenberg 和 McGuire 算法
+
+这是 Eisenberg 和 McGuire 开发的 N 过程案例的正确解决方案。 Dijkstra、Knuth 和 DeBruijn 提出了早期的解决方案。此解决方案通过将进程可能必须等待的转数限制减少到可能的最小值 n-1，从而改进了之前的解决方案。
+
+概念：转变量和状态标志在 Dekker 算法中用于 2 进程情况。这些标志现在具有三个可能的值：等待入口协议中的进程，等待资源的 ACTIVE 用于临界区中的进程，使用资源；和其他情况下的空闲。
+
+进程优先级以循环顺序保持，从轮到的那个开始。每个进程通过扫描所有进程开始进入协议，从一个打开的进程到它自己。如果存在竞争，这些是唯一可能必须首先进行的过程。
+
+如果扫描发现所有进程都处于空闲状态，则进程暂时进入 ACTIVE 状态。但是，仍然有可能稍后开始扫描但属于我们之前的另一个进程也将达到此状态。我们再检查一次以确保没有活动进程。
