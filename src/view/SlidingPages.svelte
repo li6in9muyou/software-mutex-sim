@@ -19,7 +19,9 @@
   </Frame>
 
   <Frame>
-    <slot name="right">right</slot>
+    {#if offset === 2}
+      <slot name="right">right</slot>
+    {/if}
   </Frame>
 </main>
 

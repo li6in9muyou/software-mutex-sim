@@ -2,15 +2,15 @@
   import { find, join, times } from "lodash";
   import { router } from "./model";
   import type IStaticAlgorithmDescription from "../algorithms/IStaticAlgorithmDescription";
-  import { CurrentSelectedAlgorithm } from "./algorithm_config";
+  import { StaticDescription } from "./algorithm_config";
   import { get } from "svelte/store";
 
   export let options: IStaticAlgorithmDescription[] = [];
 
-  let sName = get(CurrentSelectedAlgorithm)?.name;
-  $: CurrentSelectedAlgorithm.set(find(options, (op) => op.name === sName));
+  let sName = get(StaticDescription)?.name;
+  $: StaticDescription.set(find(options, (op) => op.name === sName));
   $: description =
-    $CurrentSelectedAlgorithm?.description ??
+    $StaticDescription?.description ??
     join(
       times(10, () => sName),
       ", "
