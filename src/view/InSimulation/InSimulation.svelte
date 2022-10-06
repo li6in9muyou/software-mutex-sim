@@ -10,7 +10,7 @@
   import { ProcessState } from "../../use_case/RunningSync";
   import type IProcessHandle from "../../use_case/ProcessHandle";
   import make_handle from "../adapter/SingleProcessHandleAdapter";
-  import SourceCodeView from "./SourceCodeView/Main.svelte";
+  import SourceCodeView from "./SourceCodeView/SourceCodeView.svelte";
   const note = debug("InSimulation::Main");
 
   export let memory_store: MemorySliceStores = null;

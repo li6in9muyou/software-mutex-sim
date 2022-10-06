@@ -1,5 +1,5 @@
 <script lang="ts">
-  import InSimulation from "./view/InSimulation/Main.svelte";
+  import InSimulation from "./view/InSimulation/InSimulation.svelte";
   import AlgorithmSelect from "./view/AlgorithmSelect.svelte";
   import { Lamport } from "./algorithms/Lamport/constants";
   import {
