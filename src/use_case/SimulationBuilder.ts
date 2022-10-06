@@ -26,10 +26,10 @@ export default class SimulationBuilder {
   }
 
   init_stores() {
-    const { process_count, prefix, get_memory } = this.algorithmDef;
+    const { process_count, get_memory } = this.algorithmDef;
     this.memory = get_memory(process_count);
     const [memory_store, m] = createMemorySyncStoreAndSync(this.memory);
-    const con = new ContendingOrNot(prefix, new SveltePort(process_count));
+    const con = new ContendingOrNot(new SveltePort(process_count));
     this.soa.messages.subscribe(con.core_message_handler);
     this.soa.messages.subscribe(con.debug_message_handler);
     this.soa.messages.subscribe(m);

@@ -1,7 +1,7 @@
 import type { SveltePort } from "../SveltePort";
 import debug from "debug";
 import type { Readable } from "svelte/store";
-import { capitalize, isArray } from "lodash";
+import { isArray } from "lodash";
 import type { Observable } from "threads/observable";
 
 export type ContendingOrNotEvent = ["pre" | "post", number];
@@ -9,13 +9,8 @@ export type ContendingOrNotEvent = ["pre" | "post", number];
 export default class ContendingOrNot {
   public readonly debug_message_handler: (...args: any[]) => void;
 
-  constructor(
-    private readonly name: string,
-    private readonly port: SveltePort
-  ) {
-    this.debug_message_handler = debug(
-      `ContendingOrNot:${capitalize(this.name)}:Debug`
-    );
+  constructor(private readonly port: SveltePort) {
+    this.debug_message_handler = debug(`ContendingOrNot:Debug`);
   }
 
   attach(source: Observable<ContendingOrNotEvent>) {
