@@ -30,7 +30,7 @@ export default class ProcessGroup {
   }
 
   pauseAll() {
-    this.sb.get_process_handle().pause_all();
+    this.sb.get_process_handle().pauseAll();
   }
 
   resumeAll() {
