@@ -40,4 +40,8 @@ export default class ProcessGroup {
   runAll() {
     this.sb.get_process_handle().runAll();
   }
+
+  killAll() {
+    this.sb.soa.processes_handle.kill_all();
+  }
 }

@@ -74,4 +74,14 @@ export default class StartManyProcesses {
   resume_by_pid(pid: number) {
     this.processes[pid].resume();
   }
+
+  async kill_all() {
+    await this.create_process_promise;
+    return await Promise.all(
+      this.processes.map(async (cpu, pid) => {
+        await Thread.terminate(cpu);
+        note(`process ${pid} is killed`);
+      })
+    );
+  }
 }

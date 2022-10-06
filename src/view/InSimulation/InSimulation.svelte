@@ -1,26 +1,26 @@
 <script lang="ts">
   import { every, range } from "lodash";
-  import { derived, get, type Writable, type Readable } from "svelte/store";
+  import { derived, get } from "svelte/store";
   import { router } from "../model";
-  import { type MemorySliceStores } from "../../use_case/MemoryWriteSync";
   import debug from "debug";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import Memory from "./Memory.svelte";
   import ProcessAgent from "./ProcessAgent.svelte";
   import { ProcessState } from "../../use_case/RunningSync";
   import SourceCodeView from "./SourceCodeView/SourceCodeView.svelte";
   import ProcessGroup from "../../use_case/ProcessGroupFacade";
   import { CurrentSelectedAlgorithm } from "../algorithm_config";
+  import SimulationBuilder from "../../use_case/SimulationBuilder";
   const note = debug("InSimulation::Main");
 
-  export let ProcessHandle: ProcessGroup;
-
-  const memory_store: MemorySliceStores = ProcessHandle.get_store("Memory");
-  const processRunningState: Writable<ProcessState[]> =
-    ProcessHandle.get_store("LifeCycle");
-  const is_in_region: Readable<boolean[]> = ProcessHandle.get_store("WhoIsIn");
-  const many_lineno: Readable<number[]> = ProcessHandle.get_store("LineNumber");
   const process_count: number = $CurrentSelectedAlgorithm.process_count;
+  const ProcessHandle: ProcessGroup = ProcessGroup.GetMany(
+    new SimulationBuilder($CurrentSelectedAlgorithm)
+  );
+  const memory_store = ProcessHandle.get_store("Memory");
+  const processRunningState = ProcessHandle.get_store("LifeCycle");
+  const is_in_region = ProcessHandle.get_store("WhoIsIn");
+  const many_lineno = ProcessHandle.get_store("LineNumber");
 
   onMount(() => {
     note("begin!");
@@ -28,6 +28,11 @@
       "stores: %o",
       [processRunningState, is_in_region, many_lineno].map((s: any) => get(s))
     );
+  });
+
+  onDestroy(() => {
+    note("finish!");
+    ProcessHandle.killAll();
   });
 
   $: CurrentProcessLineno = derived(many_lineno, (arr) => arr[selectedPid]);
