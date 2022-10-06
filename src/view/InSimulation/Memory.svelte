@@ -9,9 +9,9 @@
 {#each Object.keys($stores) as label}
   <div>
     <div class="mb-2 text-xl">{label}</div>
-    <div class="mb-3 flex w-full gap-1">
+    <div class="mb-3 flex w-full flex-wrap gap-2">
       {#each get($stores[label]) as element}
-        <div class="flex flex-1 justify-center border border-secondary text-xl">
+        <div class="flex w-fit justify-center border border-secondary text-xl">
           {element}
         </div>
       {/each}
