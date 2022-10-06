@@ -1,12 +1,12 @@
 <script lang="ts">
   import InSimulation from "./view/InSimulation/InSimulation.svelte";
   import AlgorithmSelect from "./view/AlgorithmSelect.svelte";
-  import { Lamport } from "./algorithms/Lamport/constants";
   import { StaticDescription } from "./view/algorithm_config";
   import { head } from "lodash";
   import AlgorithmConfig from "./view/AlgorithmConfig.svelte";
   import SlidingPages from "./view/SlidingPages.svelte";
   import SlidingPagesAdapter from "./view/adapter/SlidingPagesAdapter.js";
+  import Lamport from "./algorithms/Lamport/AlgorithmDescription";
 
   const availableAlgorithms = [Lamport];
   StaticDescription.set(head(availableAlgorithms));
