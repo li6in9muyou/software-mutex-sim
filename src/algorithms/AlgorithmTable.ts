@@ -1,5 +1,5 @@
-import Lamport from "./Lamport/AlgorithmDescription";
-import Peterson from "./Peterson/AlgorithmDescription";
+import Lamport from "./Lamport/Lamport.desc";
+import Peterson from "./Peterson/Peterson.desc";
 import Dekker from "./Dekker/Dekker.desc";
 import EisenbergAndMcGuire from "./EisenbergAndMcGuire/EisenbergAndMcGuire.desc";
 
