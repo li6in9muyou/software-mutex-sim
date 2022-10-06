@@ -10,12 +10,12 @@
 
 <div class="navbar mb-2 rounded bg-base-200 shadow-xl">
   <div class="navbar-start">
-    <a class="btn" on:click={() => router.pop()}>back</a>
+    <div class="btn" on:click={() => router.pop()}>back</div>
   </div>
   <div class="navbar-end gap-2">
-    <a class="btn btn-success" on:click={() => router.push("InSimulation")}
-      >go</a
-    >
+    <div class="btn btn-success" on:click={() => router.push("InSimulation")}>
+      go
+    </div>
   </div>
 </div>
 

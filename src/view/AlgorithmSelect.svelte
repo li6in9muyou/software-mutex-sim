@@ -19,18 +19,19 @@
 
 <div class="navbar mb-2 rounded bg-base-200 shadow-xl">
   <div class="navbar-start">
-    <a class="btn btn-ghost text-4xl normal-case text-accent">MutexSim</a>
+    <div class="btn btn-ghost text-4xl normal-case text-accent">MutexSim</div>
   </div>
   <div class="navbar-end">
-    <a class="btn" on:click={() => router.push("AlgoConfig")}>next</a>
+    <div class="btn" on:click={() => router.push("AlgoConfig")}>next</div>
   </div>
 </div>
 
 <main class="p-4">
-  <label class="label">
+  <label class="label" for="SelectAlgo">
     <span class="label-text mb-4 text-2xl underline">Choose an algorithm</span>
   </label>
   <select
+    id="SelectAlgo"
     class="select select-primary w-full max-w-xs text-xl"
     bind:value={sName}
   >
