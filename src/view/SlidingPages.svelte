@@ -10,18 +10,16 @@
   class:offset-1={offset === 1}
   class:offset-2={offset === 2}
 >
-  <Frame>
+  <Frame {offset} id={0}>
     <slot name="left">left</slot>
   </Frame>
 
-  <Frame>
+  <Frame {offset} id={1}>
     <slot name="middle">middle</slot>
   </Frame>
 
-  <Frame>
-    {#if offset === 2}
-      <slot name="right">right</slot>
-    {/if}
+  <Frame {offset} id={2}>
+    <slot name="right">right</slot>
   </Frame>
 </main>
 
