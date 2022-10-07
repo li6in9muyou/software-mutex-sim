@@ -7,9 +7,11 @@
   import SlidingPages from "./view/SlidingPages.svelte";
   import SlidingPagesAdapter from "./view/adapter/SlidingPagesAdapter.js";
   import AlgorithmTable from "./algorithms/AlgorithmTable";
+  import MockProcessGroup from "./view/MockProcessGroup";
 
   const availableAlgorithms = Array.from(AlgorithmTable.values());
   StaticDescription.set(head(availableAlgorithms));
+  let processGroup = new MockProcessGroup();
 </script>
 
 <div class="w-full overflow-x-hidden">
@@ -21,7 +23,7 @@
       <AlgorithmConfig />
     </slot>
     <slot slot="right">
-      <InSimulation />
+      <InSimulation {processGroup} />
     </slot>
   </SlidingPages>
 </div>

@@ -1,36 +1,38 @@
 <script lang="ts">
   import { every, range } from "lodash";
-  import { derived, get } from "svelte/store";
+  import { derived } from "svelte/store";
   import { router } from "../model";
   import debug from "debug";
   import { onDestroy, onMount } from "svelte";
   import Memory from "./Memory.svelte";
   import ProcessAgent from "./ProcessAgent.svelte";
-  import { ProcessState } from "../../use_case/RunningSync";
   import SourceCodeView from "./SourceCodeView/SourceCodeView.svelte";
-  import ProcessGroup from "../../use_case/ProcessGroupFacade";
-  import { CurrentSelectedAlgorithm } from "../algorithm_config";
-  import SimulationBuilder from "../../use_case/SimulationBuilder";
-  const note = debug("InSimulation::Main");
+  import type IProcessGroup from "../../use_case/IProcessGroup";
+  import { ProcessLifeCycle } from "../../use_case/IProcess";
+  import { LockingState } from "../../use_case/IProgram";
+  const note = debug("InSimulation-tk2.svelte");
 
-  const process_count: number = $CurrentSelectedAlgorithm.process_count;
-  let manyProcess: ProcessGroup = ProcessGroup.GetMany(
-    new SimulationBuilder($CurrentSelectedAlgorithm)
+  export let processGroup: IProcessGroup;
+
+  const process_count: number = processGroup.process_count;
+  let manyProcess = processGroup;
+  let memory_store = manyProcess.memory;
+  let processRunningState = derived(
+    manyProcess.all.execution_state,
+    (arr, set) => set(arr)
   );
-  let memory_store = manyProcess.get_store("Memory");
-  let processRunningState = manyProcess.get_store("LifeCycle");
-  let is_in_region = manyProcess.get_store("WhoIsIn");
-  let many_lineno = manyProcess.get_store("LineNumber");
+  let is_in_region = derived(
+    manyProcess.all.program.map((prog) => prog.locking_state),
+    (lock, set) => {
+      set(lock.map((state) => state === LockingState.Locked));
+    }
+  );
   let allCompleted = derived(processRunningState, (arr) =>
-    every(arr, (s) => s === ProcessState.completed)
+    every(arr, (s) => s === ProcessLifeCycle.completed)
   );
 
   onMount(() => {
     note("begin!");
-    note(
-      "stores: %o",
-      [processRunningState, is_in_region, many_lineno].map((s: any) => get(s))
-    );
   });
 
   onDestroy(() => {
@@ -38,7 +40,8 @@
     manyProcess.all.kill();
   });
 
-  $: CurrentProcessLineno = derived(many_lineno, (arr) => arr[selectedPid]);
+  let selectedPid = 0;
+  $: CurrentProcessLineno = manyProcess.all.program[selectedPid].line_number;
 
   let allPaused = true;
   function onToggleAllRunOrPause() {
@@ -61,20 +64,7 @@
     started = false;
     allPaused = false;
     manyProcess.all.kill();
-
-    manyProcess = ProcessGroup.GetMany(
-      new SimulationBuilder($CurrentSelectedAlgorithm)
-    );
-    memory_store = manyProcess.get_store("Memory");
-    processRunningState = manyProcess.get_store("LifeCycle");
-    is_in_region = manyProcess.get_store("WhoIsIn");
-    many_lineno = manyProcess.get_store("LineNumber");
-    allCompleted = derived(processRunningState, (arr) =>
-      every(arr, (s) => s === ProcessState.completed)
-    );
   }
-
-  let selectedPid = 0;
 </script>
 
 <div class="navbar mb-2 rounded bg-base-200 shadow-xl">
