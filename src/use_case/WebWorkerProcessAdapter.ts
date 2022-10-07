@@ -42,7 +42,9 @@ export default class WebWorkerProcess implements IProcess {
     con.attach(this.source as Observable<ContendingOrNotEvent>);
     const [overview, ,] = con.get_stores_overview_contending_acquired();
     return {
-      line_number: rs.lineno[0],
+      line_number: derived(rs.lineno, (arr, set) => {
+        set(arr[0]);
+      }),
       locking_state: this.locking_convert(overview),
     };
   }
