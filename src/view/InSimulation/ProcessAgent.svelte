@@ -1,12 +1,20 @@
 <script lang="ts">
   import type IProcess from "../../use_case/IProcess";
   import { ProcessLifeCycle } from "../../use_case/IProcessLifeCycle";
+  import { isNull, some } from "lodash";
+  import { LockingState } from "../../use_case/IProgram";
 
-  export let pid: number = null;
   export let selectedPid: number = null;
-  export let in_region: boolean = null;
-  export let procState: ProcessLifeCycle = null;
   export let ProcessHandle: IProcess = null;
+  if (some([selectedPid, ProcessHandle], isNull)) {
+    throw new Error("invalid arguments");
+  }
+  const pid = ProcessHandle.pid;
+  let procState, in_region;
+  ProcessHandle.execution_state.subscribe((v) => (procState = v));
+  ProcessHandle.program.locking_state.subscribe(
+    (v) => (in_region = v === LockingState.Locked)
+  );
 
   let showPauseSpinner = false;
   function handleToggle() {

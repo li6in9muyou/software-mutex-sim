@@ -100,13 +100,7 @@
     <h2 class="mb-2 text-2xl underline">inspect one process</h2>
     <div class="flex max-h-64 flex-wrap gap-3 overflow-y-auto">
       {#each range(0, process_count) as pid}
-        <ProcessAgent
-          {pid}
-          bind:selectedPid
-          in_region={$is_in_region[pid]}
-          procState={$processRunningState[pid]}
-          ProcessHandle={manyProcess.pid(pid)}
-        />
+        <ProcessAgent bind:selectedPid ProcessHandle={manyProcess.pid(pid)} />
       {/each}
     </div>
   </section>
