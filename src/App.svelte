@@ -7,7 +7,7 @@
   import SlidingPages from "./view/SlidingPages.svelte";
   import SlidingPagesAdapter from "./view/adapter/SlidingPagesAdapter.js";
   import AlgorithmTable from "./algorithms/AlgorithmTable";
-  import MockProcessGroup from "./view/MockProcessGroup";
+  import MockProcessGroup from "./view/mocks/MockProcessGroup";
 
   const availableAlgorithms = Array.from(AlgorithmTable.values());
   StaticDescription.set(head(availableAlgorithms));

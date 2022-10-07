@@ -1,12 +1,12 @@
 import type { Readable } from "svelte/store";
-import type IProcessGroup from "../use_case/IProcessGroup";
-import type { IProcessGroupQuery } from "../use_case/IProcessGroup";
-import type IProcess from "../use_case/IProcess";
+import type IProcessGroup from "../../use_case/IProcessGroup";
+import type { IProcessGroupQuery } from "../../use_case/IProcessGroup";
+import type IProcess from "../../use_case/IProcess";
 import { times } from "lodash";
 import { readable } from "svelte/store";
-import { ProcessLifeCycle } from "../use_case/IProcess";
-import type IProgram from "../use_case/IProgram";
-import { LockingState } from "../use_case/IProgram";
+import { ProcessLifeCycle } from "../../use_case/IProcess";
+import type IProgram from "../../use_case/IProgram";
+import { LockingState } from "../../use_case/IProgram";
 
 export default class MockProcessGroup implements IProcessGroup {
   readonly memory: Map<string, Readable<Array<number>>>;
