@@ -5,10 +5,12 @@ import { ProcessLifeCycle } from "./IProcessLifeCycle";
 import type IProgram from "./IProgram";
 import { LockingState } from "./IProgram";
 import { spawn, Thread } from "threads";
-import { Subject } from "threads/observable";
+import { Observable, Subject } from "threads/observable";
 import debug from "debug";
 import RunningSync, { ProcessState } from "./RunningSync";
-import ContendingOrNot from "../port/ContendingOrNot";
+import ContendingOrNot, {
+  type ContendingOrNotEvent,
+} from "../port/ContendingOrNot";
 import { SveltePort } from "../port/SveltePort";
 
 export default class WebWorkerProcess implements IProcess {
@@ -36,6 +38,7 @@ export default class WebWorkerProcess implements IProcess {
   }
 
   private toProgram(rs: RunningSync, con: ContendingOrNot): IProgram {
+    con.attach(this.source as Observable<ContendingOrNotEvent>);
     const [overview, ,] = con.get_stores_overview_contending_acquired();
     return {
       line_number: rs.lineno[0],
@@ -53,7 +56,10 @@ export default class WebWorkerProcess implements IProcess {
 
   execution_state: Readable<ProcessLifeCycle>;
   program: IProgram;
-  readonly source = new Subject();
+  private readonly _source = new Subject();
+  get source() {
+    return Observable.from(this._source);
+  }
   private impl: any;
   private readonly note: debug.Debugger;
 
@@ -80,7 +86,7 @@ export default class WebWorkerProcess implements IProcess {
   ) {
     this.note = debug(`WebWorkerProcess[${pid}]`);
     const sub = (msg) => {
-      this.source.next(msg);
+      this._source.next(msg);
     };
     (async () => {
       const c = await spawn(
