@@ -1,10 +1,10 @@
 import type { Readable } from "svelte/store";
 
 export enum LockingState {
-  Locking,
-  Locked,
-  Unlocking,
-  Unlocked,
+  Locking = "Locking",
+  Locked = "Locked",
+  Unlocking = "Unlocking",
+  Unlocked = "Unlocked",
 }
 
 export default interface IProgram {

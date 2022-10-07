@@ -2,10 +2,10 @@ import type { Readable } from "svelte/store";
 import type IProgram from "./IProgram";
 
 export enum ProcessLifeCycle {
-  ready,
-  running,
-  paused,
-  completed,
+  ready = "ready",
+  running = "running",
+  paused = "paused",
+  completed = "completed",
 }
 
 export interface IProcessQuery {
