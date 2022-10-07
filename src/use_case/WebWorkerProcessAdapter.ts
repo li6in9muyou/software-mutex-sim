@@ -109,7 +109,7 @@ class LockCriticalRegionUnlockProgram implements IProgram {
   private sub(ev: any) {
     switch (ev.type) {
       case "lineno": {
-        return this.line_number.set(ev.payload.lineno);
+        return this.line_number.set(ev.payload);
       }
       case "pre": {
         return this.locking_state.set(LockingState.Locked);

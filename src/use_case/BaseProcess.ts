@@ -2,6 +2,7 @@ import { isUndefined } from "lodash";
 import { Observable, Subject } from "threads/observable";
 import { merge } from "observable-fns";
 import type { RunningSyncEvent } from "./RunningSync";
+import { Post, Pre } from "./ReportingEvents";
 
 export default () => {
   let shouldPause = false;
@@ -44,9 +45,9 @@ export default () => {
         payload: _i,
       });
       await lock_impl(useMessageBus, pid, ...args);
-      _core_msg.next(["pre", pid]);
+      _core_msg.next(Pre());
       await critical_region();
-      _core_msg.next(["post", pid]);
+      _core_msg.next(Post());
       await unlock_impl(useMessageBus, pid, ...args);
       _core_msg.next({ type: "completed", payload: pid });
     };
