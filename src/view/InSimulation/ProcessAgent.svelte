@@ -1,21 +1,21 @@
 <script lang="ts">
-  import { ProcessState } from "../../use_case/RunningSync";
   import type IProcess from "../../use_case/IProcess";
+  import { ProcessLifeCycle } from "../../use_case/IProcessLifeCycle";
 
   export let pid: number = null;
   export let selectedPid: number = null;
   export let in_region: boolean = null;
-  export let procState: ProcessState = null;
+  export let procState: ProcessLifeCycle = null;
   export let ProcessHandle: IProcess = null;
 
   let showPauseSpinner = false;
   function handleToggle() {
     switch (procState) {
-      case ProcessState.paused: {
+      case ProcessLifeCycle.paused: {
         ProcessHandle.resume();
         break;
       }
-      case ProcessState.running: {
+      case ProcessLifeCycle.running: {
         ProcessHandle.pause();
         break;
       }
@@ -23,15 +23,16 @@
   }
 
   const procStateDisplay = new Map([
-    [ProcessState.ready, "▶"],
-    [ProcessState.completed, "✅"],
-    [ProcessState.running, "🏃"],
-    [ProcessState.paused, "⏸"],
+    [ProcessLifeCycle.ready, "▶"],
+    [ProcessLifeCycle.completed, "✅"],
+    [ProcessLifeCycle.running, "🏃"],
+    [ProcessLifeCycle.paused, "⏸"],
   ]);
 
   $: isSelected = pid === selectedPid;
   $: isIdle =
-    procState === ProcessState.ready || procState === ProcessState.completed;
+    procState === ProcessLifeCycle.ready ||
+    procState === ProcessLifeCycle.completed;
   $: description =
     `${procStateDisplay.get(procState)} #${pid} ` +
     `${in_region ? "🔒✔" : "✖"}`;
@@ -81,8 +82,8 @@
     {:else}
       <button
         class:btn-disabled={!isSelected}
-        class:btn-warning={procState === ProcessState.running}
-        class:btn-success={procState === ProcessState.paused}
+        class:btn-warning={procState === ProcessLifeCycle.running}
+        class:btn-success={procState === ProcessLifeCycle.paused}
         class="btn btn-sm ml-auto"
         on:click={handleToggle}
       >
@@ -108,7 +109,7 @@
             />
           </svg>
         {/if}
-        {procState === ProcessState.running ? "pause" : "resume"}
+        {procState === ProcessLifeCycle.running ? "pause" : "resume"}
       </button>
     {/if}
   {/if}
