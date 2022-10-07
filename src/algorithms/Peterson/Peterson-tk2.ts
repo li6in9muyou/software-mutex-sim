@@ -15,13 +15,13 @@ function can_proceed(me, waiting_room_idx, l, v) {
   return v[waiting_room_idx] != me || at_highest_level;
 }
 
-async function lock(use_msg, pid, memory, process_count) {
+async function lock(use_msg, pid, memory) {
   const [dbg, , mPipe] = use_msg();
-  dbg.next("lock received args: ", memory, process_count);
+  dbg.next("lock received args: ", memory);
   const { level, victim } = useMonitoredMemory(mPipe, memory);
   dbg.next("memory", level, victim);
 
-  for (let i = 1; i < process_count; i++) {
+  for (let i = 1; i < victim.length; i++) {
     await break_point(1);
 
     await break_point(2);

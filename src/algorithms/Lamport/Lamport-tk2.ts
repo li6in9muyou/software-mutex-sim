@@ -19,9 +19,9 @@ function should_wait(who: number, ...memory: Int32Array[]): boolean {
     .some((i) => i);
 }
 
-async function lock(use_msg, pid, memory, process_count) {
+async function lock(use_msg, pid, memory) {
   const [dbg, , mPipe] = use_msg();
-  dbg.next("lock received args: ", memory, process_count);
+  dbg.next("lock received args: ", memory);
   const { flag, label } = useMonitoredMemory(mPipe, memory);
   dbg.next("memory", flag, label);
 

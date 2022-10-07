@@ -5,11 +5,12 @@ import { WANT_IN, IDLE, IN_CS } from "./constants";
 import { useMonitoredMemory } from "../../use_case/MemoryWriteSync";
 const { Demo, break_point: bp } = ImportBaseProcessModule();
 
-async function lock(use_msg, who, memory, process_count) {
+async function lock(use_msg, who, memory) {
   const [dbg, , mPipe] = use_msg();
-  dbg.next("lock received args: ", memory, process_count);
+  dbg.next("lock received args: ", memory);
   const { flag, turn } = useMonitoredMemory(mPipe, memory);
   dbg.next("memory", flag, turn);
+  const process_count = flag.length;
 
   const i = who;
   let j;
