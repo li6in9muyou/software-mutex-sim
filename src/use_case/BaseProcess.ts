@@ -79,6 +79,10 @@ export default () => {
     await pause_stub();
   }
 
+  function disable_breakpoints() {
+    _pauseAtEveryBreakpoint = false;
+  }
+
   const Demo = (lock_impl, unlock_impl, critical_region) => ({
     memory_msg() {
       return Observable.from(_mem_msg);
@@ -110,9 +114,7 @@ export default () => {
     enable_breakpoints() {
       _pauseAtEveryBreakpoint = true;
     },
-    disable_breakpoints() {
-      _pauseAtEveryBreakpoint = false;
-    },
+    disable_breakpoints,
     async run(pid: number, ...args: any[]) {
       dbg(`${pid} starts running with args ${JSON.stringify(args)}`);
       _i = pid;
@@ -124,7 +126,7 @@ export default () => {
       )(use_message_bus, pid, ...args);
 
       dbg(`${pid} completed`);
-      this.disable_breakpoints();
+      disable_breakpoints();
       return [ans, pid];
     },
   });
