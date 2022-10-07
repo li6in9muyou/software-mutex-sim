@@ -1,7 +1,7 @@
 import type { Readable } from "svelte/store";
 import { derived } from "svelte/store";
 import type IProcess from "./IProcess";
-import { ProcessLifeCycle } from "./IProcess";
+import { ProcessLifeCycle } from "./IProcessLifeCycle";
 import type IProgram from "./IProgram";
 import { LockingState } from "./IProgram";
 import { spawn, Thread } from "threads";

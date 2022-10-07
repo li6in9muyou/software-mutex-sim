@@ -8,7 +8,7 @@
   import ProcessAgent from "./ProcessAgent.svelte";
   import SourceCodeView from "./SourceCodeView/SourceCodeView.svelte";
   import type IProcessGroup from "../../use_case/IProcessGroup";
-  import { ProcessLifeCycle } from "../../use_case/IProcess";
+  import { ProcessLifeCycle } from "../../use_case/IProcessLifeCycle";
   import { LockingState } from "../../use_case/IProgram";
   const note = debug("InSimulation.svelte");
 

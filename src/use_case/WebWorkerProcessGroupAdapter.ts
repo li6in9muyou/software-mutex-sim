@@ -8,7 +8,7 @@ import { createMemorySyncStoreAndSync } from "./MemoryWriteSync";
 import WebWorkerProcess from "./WebWorkerProcessAdapter";
 import { get, writable } from "svelte/store";
 import debug from "debug";
-import type { ProcessLifeCycle } from "./IProcess";
+import type { ProcessLifeCycle } from "./IProcessLifeCycle";
 import type IProgram from "./IProgram";
 const note = debug("WebWorkerProcessGroup");
 

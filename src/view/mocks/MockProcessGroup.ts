@@ -5,7 +5,7 @@ import type IProcess from "../../use_case/IProcess";
 import type { IProcessCommand } from "../../use_case/IProcess";
 import { times } from "lodash";
 import { readable } from "svelte/store";
-import { ProcessLifeCycle } from "../../use_case/IProcess";
+import { ProcessLifeCycle } from "../../use_case/IProcessLifeCycle";
 import type IProgram from "../../use_case/IProgram";
 import { LockingState } from "../../use_case/IProgram";
 
