@@ -1,14 +1,16 @@
 import type { Readable } from "svelte/store";
+import type IProgram from "./IProgram";
 
-export enum ProcessState {
+export enum ProcessLifeCycle {
   ready,
   running,
   paused,
   completed,
 }
 
-export interface IProcessStore {
-  execution_state: Readable<ProcessState>;
+export interface IProcessQuery {
+  execution_state: Readable<ProcessLifeCycle>;
+  program: IProgram;
 }
 
 export default interface IProcess {

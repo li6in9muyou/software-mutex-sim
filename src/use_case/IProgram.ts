@@ -8,6 +8,6 @@ export enum LockingState {
 }
 
 export default interface IProgram {
-  locking_state: Readable<LockingState> | null;
-  line_number: Readable<number> | null;
+  locking_state: Readable<LockingState>;
+  line_number: Readable<number>;
 }
