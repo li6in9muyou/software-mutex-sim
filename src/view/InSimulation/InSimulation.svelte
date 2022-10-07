@@ -10,7 +10,7 @@
   import type IProcessGroup from "../../use_case/IProcessGroup";
   import { ProcessLifeCycle } from "../../use_case/IProcess";
   import { LockingState } from "../../use_case/IProgram";
-  const note = debug("InSimulation-tk2.svelte");
+  const note = debug("InSimulation.svelte");
 
   export let processGroup: IProcessGroup;
 
