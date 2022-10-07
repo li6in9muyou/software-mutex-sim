@@ -14,13 +14,16 @@
   const note = debug("InSimulation::Main");
 
   const process_count: number = $CurrentSelectedAlgorithm.process_count;
-  const manyProcess: ProcessGroup = ProcessGroup.GetMany(
+  let manyProcess: ProcessGroup = ProcessGroup.GetMany(
     new SimulationBuilder($CurrentSelectedAlgorithm)
   );
-  const memory_store = manyProcess.get_store("Memory");
-  const processRunningState = manyProcess.get_store("LifeCycle");
-  const is_in_region = manyProcess.get_store("WhoIsIn");
-  const many_lineno = manyProcess.get_store("LineNumber");
+  let memory_store = manyProcess.get_store("Memory");
+  let processRunningState = manyProcess.get_store("LifeCycle");
+  let is_in_region = manyProcess.get_store("WhoIsIn");
+  let many_lineno = manyProcess.get_store("LineNumber");
+  let allCompleted = derived(processRunningState, (arr) =>
+    every(arr, (s) => s === ProcessState.completed)
+  );
 
   onMount(() => {
     note("begin!");
@@ -54,9 +57,23 @@
     manyProcess.all.start();
   }
 
-  const allCompleted = derived(processRunningState, (arr) =>
-    every(arr, (s) => s === ProcessState.completed)
-  );
+  function onResetSim() {
+    started = false;
+    allPaused = false;
+    manyProcess.all.kill();
+
+    manyProcess = ProcessGroup.GetMany(
+      new SimulationBuilder($CurrentSelectedAlgorithm)
+    );
+    memory_store = manyProcess.get_store("Memory");
+    processRunningState = manyProcess.get_store("LifeCycle");
+    is_in_region = manyProcess.get_store("WhoIsIn");
+    many_lineno = manyProcess.get_store("LineNumber");
+    allCompleted = derived(processRunningState, (arr) =>
+      every(arr, (s) => s === ProcessState.completed)
+    );
+  }
+
   let selectedPid = 0;
 </script>
 
@@ -80,6 +97,8 @@
       >
         resume all
       </div>
+    {:else if $allCompleted}
+      <button class="btn btn-warning" on:click={onResetSim}> reset </button>
     {:else}
       <button class="btn btn-success" on:click={onStartSim}> start </button>
     {/if}

@@ -39,8 +39,6 @@ export default class StartManyProcesses {
       this.processes.map(async (cpu, pid) => {
         const ans = await cpu.run(pid, ...args);
         note("ans %o", ans);
-        await Thread.terminate(cpu);
-        note(`process ${pid} is killed`);
         return ans;
       })
     );
@@ -51,8 +49,6 @@ export default class StartManyProcesses {
     note("start pid %d", pid);
     const ans = await this.processes[pid].run(pid, ...args);
     note("ans %o", ans);
-    await Thread.terminate(this.processes[pid]);
-    note(`process ${pid} is killed`);
   }
 
   pause_all() {
