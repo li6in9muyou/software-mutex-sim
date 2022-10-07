@@ -39,6 +39,7 @@ async function lock(use_msg, who, memory, process_count) {
     if (j >= process_count && (turn[0] == i || flag[turn[0]] == IDLE)) {
       break;
     }
+    await Yield();
   } while (true);
   await bp(22);
   turn[0] = i;
@@ -54,6 +55,7 @@ async function unlock(use_msgs, who, memory, process_count) {
     pid += 1;
     pid %= process_count;
     await bp(54);
+    await Yield();
     if (flag[pid] !== IDLE) {
       break;
     }
