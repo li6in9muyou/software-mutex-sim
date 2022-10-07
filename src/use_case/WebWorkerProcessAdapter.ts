@@ -12,6 +12,7 @@ import ContendingOrNot, {
   type ContendingOrNotEvent,
 } from "../port/ContendingOrNot";
 import { SveltePort } from "../port/SveltePort";
+import { isNull } from "lodash";
 
 export default class WebWorkerProcess implements IProcess {
   private exec_convert(old: ProcessState): ProcessLifeCycle {
@@ -60,11 +61,13 @@ export default class WebWorkerProcess implements IProcess {
   get source() {
     return Observable.from(this._source);
   }
-  private impl: any;
+  private impl: any = null;
   private readonly note: debug.Debugger;
 
   async kill(): Promise<void> {
-    await Thread.terminate(this.impl);
+    if (!isNull(this.impl)) {
+      await Thread.terminate(this.impl);
+    }
   }
 
   async pause(): Promise<void> {
