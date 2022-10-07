@@ -110,6 +110,9 @@ export default () => {
     enable_breakpoints() {
       _pauseAtEveryBreakpoint = true;
     },
+    disable_breakpoints() {
+      _pauseAtEveryBreakpoint = false;
+    },
     async run(pid: number, ...args: any[]) {
       dbg(`${pid} starts running with args ${JSON.stringify(args)}`);
       _i = pid;
@@ -121,7 +124,7 @@ export default () => {
       )(use_message_bus, pid, ...args);
 
       dbg(`${pid} completed`);
-      _pauseAtEveryBreakpoint = false;
+      this.disable_breakpoints();
       return [ans, pid];
     },
   });
