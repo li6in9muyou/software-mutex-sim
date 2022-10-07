@@ -1,8 +1,15 @@
 import { isUndefined } from "lodash";
 import { Observable, Subject } from "threads/observable";
 import { merge } from "observable-fns";
-import type { RunningSyncEvent } from "./RunningSync";
-import { Post, Pre } from "./ReportingEvents";
+import {
+  Completed,
+  LineNumber,
+  Paused,
+  Post,
+  Pre,
+  Ready,
+  Running,
+} from "./ReportingEvents";
 
 export default () => {
   let shouldPause = false;
@@ -12,7 +19,7 @@ export default () => {
   let _i = 0;
   const _mem_msg = new Subject();
   const _core_msg = new Subject();
-  const _running_sync_msg = new Subject<RunningSyncEvent>();
+  const _running_sync_msg = new Subject();
   const _debug_msg = new Subject();
   const dbg = (args) => _debug_msg.next(args);
 
@@ -35,45 +42,30 @@ export default () => {
     unlock_impl,
     critical_region
   ) {
-    _running_sync_msg.next({
-      type: "ready",
-      payload: _i,
-    });
+    _running_sync_msg.next(Ready());
     return async (useMessageBus, pid: number, ...args: any[]) => {
-      _running_sync_msg.next({
-        type: "running",
-        payload: _i,
-      });
+      _running_sync_msg.next(Running());
       await lock_impl(useMessageBus, pid, ...args);
       _core_msg.next(Pre());
       await critical_region();
       _core_msg.next(Post());
       await unlock_impl(useMessageBus, pid, ...args);
-      _core_msg.next({ type: "completed", payload: pid });
+      _core_msg.next(Completed());
     };
   }
 
   async function pause_stub() {
     if (shouldPause) {
       dbg(`${_i} is paused`);
-      _running_sync_msg.next({
-        type: "paused",
-        payload: _i,
-      });
+      _running_sync_msg.next(Paused());
       await _pause;
     }
-    _running_sync_msg.next({
-      type: "running",
-      payload: _i,
-    });
+    _running_sync_msg.next(Running());
     return null;
   }
 
   async function break_point(lineno: number, message?: string) {
-    _running_sync_msg.next({
-      type: "lineno",
-      payload: { pid: _i, lineno, message },
-    });
+    _running_sync_msg.next(LineNumber(lineno));
     if (_pauseAtEveryBreakpoint) {
       pause();
     }
