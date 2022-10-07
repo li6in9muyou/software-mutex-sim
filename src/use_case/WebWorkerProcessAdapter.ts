@@ -1,62 +1,16 @@
-import type { Readable } from "svelte/store";
-import { derived } from "svelte/store";
+import type { Readable, Writable } from "svelte/store";
+import { writable } from "svelte/store";
 import type IProcess from "./IProcess";
+import type { IProcessQuery } from "./IProcess";
 import { ProcessLifeCycle } from "./IProcessLifeCycle";
 import type IProgram from "./IProgram";
 import { LockingState } from "./IProgram";
 import { spawn, Thread } from "threads";
 import { Observable, Subject } from "threads/observable";
 import debug from "debug";
-import RunningSync, { ProcessState } from "./RunningSync";
-import ContendingOrNot, {
-  type ContendingOrNotEvent,
-} from "../port/ContendingOrNot";
-import { SveltePort } from "../port/SveltePort";
-import { isNull } from "lodash";
+import { isNull, isUndefined } from "lodash";
 
 export default class WebWorkerProcess implements IProcess {
-  private exec_convert(old: ProcessState): ProcessLifeCycle {
-    switch (old) {
-      case ProcessState.completed:
-        return ProcessLifeCycle.completed;
-      case ProcessState.paused:
-        return ProcessLifeCycle.paused;
-      case ProcessState.ready:
-        return ProcessLifeCycle.ready;
-      case ProcessState.running:
-        return ProcessLifeCycle.running;
-    }
-  }
-
-  private locking_convert(
-    acquired: Readable<boolean[]>
-  ): Readable<LockingState> {
-    return derived(acquired, (arr, set) => {
-      const next_state = arr[0] ? LockingState.Locked : LockingState.Unlocked;
-      this.note(`program.locking_state = ${next_state}`);
-      set(next_state);
-    });
-  }
-
-  private toProgram(rs: RunningSync, con: ContendingOrNot): IProgram {
-    con.attach(this.source as Observable<ContendingOrNotEvent>);
-    const [overview, ,] = con.get_stores_overview_contending_acquired();
-    return {
-      line_number: derived(rs.lineno, (arr, set) => {
-        set(arr[0]);
-      }),
-      locking_state: this.locking_convert(overview),
-    };
-  }
-
-  private toExecState(rs: RunningSync): Readable<ProcessLifeCycle> {
-    return derived(rs.running, (arr, set) => {
-      const processLifeCycle = this.exec_convert(arr[0]);
-      this.note(`execution_state = ${processLifeCycle}`);
-      set(processLifeCycle);
-    });
-  }
-
   execution_state: Readable<ProcessLifeCycle>;
   program: IProgram;
   private readonly _source = new Subject();
@@ -108,8 +62,61 @@ export default class WebWorkerProcess implements IProcess {
       this.note("spawned.");
       this.impl = p;
     });
-    const rs = new RunningSync(1, this.source);
-    this.program = this.toProgram(rs, new ContendingOrNot(new SveltePort(1)));
-    this.execution_state = this.toExecState(rs);
+    const ob = new WebWorkerProcessObserver(this.pid, this.source);
+    this.program = ob.program;
+    this.execution_state = ob.execution_state;
+  }
+}
+
+function make_filter(interested: string[]) {
+  const s = new Set(interested);
+  return (ev) => s.has(ev.type);
+}
+
+class WebWorkerProcessObserver implements IProcessQuery {
+  public program: IProgram;
+  public execution_state: Writable<ProcessLifeCycle>;
+  private readonly note: debug.Debugger;
+  constructor(
+    public readonly pid: number,
+    private readonly source: Observable<any>
+  ) {
+    this.note = debug(`WebWorkerProcessObserver[${pid}]`);
+    this.execution_state = writable(ProcessLifeCycle.ready);
+    this.program = new LockCriticalRegionUnlockProgram(this.source);
+    this.source
+      .filter(make_filter(["ready", "paused", "running", "completed"]))
+      .subscribe(this.sub.bind(this));
+  }
+  private sub(ev: any) {
+    const s = ProcessLifeCycle[ev.type];
+    if (isUndefined(s)) {
+      this.note(`ProcessLifeCycle[${ev.type}] is undefined`);
+    } else {
+      this.execution_state.set(s);
+    }
+  }
+}
+
+class LockCriticalRegionUnlockProgram implements IProgram {
+  locking_state = writable(LockingState.Locking);
+  line_number = writable(0);
+  constructor(private readonly source: Observable<any>) {
+    this.source
+      .filter(make_filter(["lineno", "pre", "post"]))
+      .subscribe(this.sub.bind(this));
+  }
+  private sub(ev: any) {
+    switch (ev.type) {
+      case "lineno": {
+        return this.line_number.set(ev.payload.lineno);
+      }
+      case "pre": {
+        return this.locking_state.set(LockingState.Locked);
+      }
+      case "post": {
+        return this.locking_state.set(LockingState.Unlocked);
+      }
+    }
   }
 }
