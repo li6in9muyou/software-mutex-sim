@@ -1,8 +1,9 @@
 <script lang="ts">
   import type IProcess from "../../use_case/IProcess";
   import { ProcessLifeCycle } from "../../use_case/IProcessLifeCycle";
-  import { isNull, some } from "lodash";
+  import { isFunction, isNull, some } from "lodash";
   import { LockingState } from "../../use_case/IProgram";
+  import { get } from "svelte/store";
 
   export let selectedPid: number = null;
   export let ProcessHandle: IProcess = null;
@@ -17,7 +18,25 @@
   );
 
   let showPauseSpinner = false;
+  let unsub;
+  function showPauseSpinnerUntilChange() {
+    showPauseSpinner = true;
+    const prev = get(ProcessHandle.execution_state);
+    unsub = ProcessHandle.execution_state.subscribe((v) => {
+      if (v !== prev) {
+        showPauseSpinner = false;
+      }
+      if (isFunction(unsub)) {
+        unsub();
+      }
+    });
+  }
+  function handleStart() {
+    showPauseSpinnerUntilChange();
+    ProcessHandle.start();
+  }
   function handleToggle() {
+    showPauseSpinnerUntilChange();
     switch (procState) {
       case ProcessLifeCycle.paused: {
         ProcessHandle.resume();
@@ -59,10 +78,7 @@
   </div>
   {#if isSelected}
     {#if isIdle}
-      <button
-        class="btn btn-success btn-sm ml-auto"
-        on:click={() => ProcessHandle.start()}
-      >
+      <button class="btn btn-success btn-sm ml-auto" on:click={handleStart}>
         {#if showPauseSpinner}
           <svg
             class="-ml-1 mr-3 h-5 w-5 animate-spin text-error"
