@@ -12,7 +12,8 @@
   import { LockingState } from "../../use_case/IProgram";
   const note = debug("InSimulation.svelte");
 
-  export let processGroup: IProcessGroup;
+  export let getProcessGroup: () => IProcessGroup;
+  const processGroup = getProcessGroup();
 
   const process_count: number = processGroup.process_count;
   let manyProcess = processGroup;

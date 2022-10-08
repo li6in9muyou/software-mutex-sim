@@ -1,18 +1,17 @@
 <script lang="ts">
   import { find, join, times } from "lodash";
   import { router } from "./model";
-  import type IStaticAlgorithmDescription from "../algorithms/IStaticAlgorithmDescription";
-  import { StaticDescription } from "./algorithm_config";
-  import { get } from "svelte/store";
+  import type IAlgorithmDef from "../algorithms/IAlgorithmDef";
 
-  export let options: IStaticAlgorithmDescription[] = [];
+  export let options: IAlgorithmDef[] = [];
+  export let selected: IAlgorithmDef;
 
-  let sName = get(StaticDescription)?.name;
-  $: StaticDescription.set(find(options, (op) => op.name === sName));
+  let sName = selected.name;
+  $: selected = find(options, (op) => op.name === sName);
   $: description =
-    $StaticDescription?.description ??
+    selected.description ??
     join(
-      times(10, () => sName),
+      times(10, () => selected.name),
       ", "
     );
 </script>
