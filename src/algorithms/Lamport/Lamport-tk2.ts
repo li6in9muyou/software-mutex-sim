@@ -1,6 +1,6 @@
 import { expose } from "threads";
 import ImportBaseProcessModule from "../../use_case/BaseProcess";
-import { Idle, Yield } from "../utility";
+import { Idle } from "../utility";
 import { max } from "lodash";
 import { FALSE, TRUE } from "./constants";
 import { useMonitoredMemory } from "../../use_case/MemoryWriteSync";
@@ -31,7 +31,7 @@ async function lock(use_msg, pid, memory) {
   await break_point(2);
   await break_point(3);
   do {
-    await Yield();
+    await break_point(51);
   } while (should_wait(pid, label, flag));
   await break_point(4);
 }
