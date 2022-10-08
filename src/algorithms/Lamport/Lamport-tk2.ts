@@ -32,6 +32,7 @@ async function lock(use_msg, pid, memory) {
   await break_point(3);
   do {
     await break_point(51);
+    await Idle(0.1);
   } while (should_wait(pid, label, flag));
   await break_point(4);
 }
