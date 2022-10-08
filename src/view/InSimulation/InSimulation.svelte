@@ -9,7 +9,6 @@
   import SourceCodeView from "./SourceCodeView/SourceCodeView.svelte";
   import type IProcessGroup from "../../use_case/IProcessGroup";
   import { ProcessLifeCycle } from "../../use_case/IProcessLifeCycle";
-  import { LockingState } from "../../use_case/IProgram";
   const note = debug("InSimulation.svelte");
 
   export let getProcessGroup: () => IProcessGroup;
@@ -21,12 +20,6 @@
   let processRunningState = derived(
     manyProcess.all.execution_state,
     (arr, set) => set(arr)
-  );
-  let is_in_region = derived(
-    manyProcess.all.program.map((prog) => prog.locking_state),
-    (lock, set) => {
-      set(lock.map((state) => state === LockingState.Locked));
-    }
   );
   let allCompleted = derived(processRunningState, (arr) =>
     every(arr, (s) => s === ProcessLifeCycle.completed)
