@@ -31,6 +31,9 @@ export default class WebWorkerProcessGroup
   async start(): Promise<void> {
     await Promise.all(this.processes.map((p) => p.start()));
   }
+  async set_breakpoint(to_be: boolean) {
+    await Promise.all(this.processes.map((p) => p.set_breakpoint(to_be)));
+  }
   get all(): IProcessGroupQuery & IProcessCommand {
     return this;
   }

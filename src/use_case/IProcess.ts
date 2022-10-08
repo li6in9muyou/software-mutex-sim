@@ -13,6 +13,7 @@ export interface IProcessCommand {
   resume(): Promise<void>;
   pause(): Promise<void>;
   kill(): Promise<void>;
+  set_breakpoint(to_be: boolean): Promise<void>;
 }
 
 export default interface IProcess extends IProcessCommand, IProcessQuery {}

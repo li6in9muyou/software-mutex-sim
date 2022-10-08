@@ -17,6 +17,7 @@
     setContext("source_code", selected.source_code);
     setContext("memory_transform", selected.memory_transform);
   }
+  $: setContext("enable_breakpoint", enable_breakpoint);
   $: getProcessGroup = () =>
     new WebWorkerProcessGroup(
       process_count,

@@ -3,7 +3,7 @@
   import { derived } from "svelte/store";
   import { router } from "../model";
   import debug from "debug";
-  import { onDestroy, onMount } from "svelte";
+  import { getContext, onDestroy, onMount } from "svelte";
   import Memory from "./Memory.svelte";
   import ProcessAgent from "./ProcessAgent.svelte";
   import SourceCodeView from "./SourceCodeView/SourceCodeView.svelte";
@@ -13,7 +13,13 @@
 
   export let getProcessGroup: () => IProcessGroup;
   const processGroup = getProcessGroup();
+  const enable_breakpoint = getContext("enable_breakpoint");
 
+  if (enable_breakpoint === true || enable_breakpoint === false) {
+    processGroup.all.set_breakpoint(enable_breakpoint);
+  }else{
+    note(`enable_breakpoint=${enable_breakpoint}`)
+  }
   const process_count: number = processGroup.process_count;
   let manyProcess = processGroup;
   let memory_store = manyProcess.memory;

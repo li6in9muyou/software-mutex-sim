@@ -38,6 +38,14 @@ export default class WebWorkerProcess implements IProcess {
     await this.impl.run(this.pid, this.shard_memory);
   }
 
+  async set_breakpoint(to_be: boolean): Promise<void> {
+    if (to_be) {
+      await this.impl.enable_breakpoints();
+    } else {
+      await this.impl.disable_breakpoints();
+    }
+  }
+
   constructor(
     private readonly process_url: URL,
     public readonly pid: number,

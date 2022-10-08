@@ -22,8 +22,10 @@
   </div>
 </div>
 
-<h1 class="text-2xl underline">How many processes to spawn?</h1>
-<h2 class="mt-16 mb-8 text-6xl">{process_count}</h2>
+<div class="flex place-content-between items-center ">
+  <span class="text-2xl underline">Process count</span>
+  <div class="my-6 text-4xl">{process_count}</div>
+</div>
 <input
   type="range"
   min="1"
@@ -37,4 +39,15 @@
     <span class="text-2xl">{stop}</span>
   {/each}
   <span class="text-2xl">{maxCount}</span>
+</div>
+<div class="divider" />
+<div class="form-control mt-12">
+  <label class="label cursor-pointer">
+    <span class="label-text text-2xl underline">Enable breakpoint</span>
+    <input
+      type="checkbox"
+      class="toggle toggle-primary toggle-lg"
+      bind:checked={enable_breakpoint}
+    />
+  </label>
 </div>
