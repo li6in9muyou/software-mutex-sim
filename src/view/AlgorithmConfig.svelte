@@ -1,11 +1,13 @@
 <script lang="ts">
   import { router } from "./model";
   import { range } from "lodash";
-  import type ISimulationConfig from "../use_case/ISimulationConfig";
 
-  export let config: ISimulationConfig;
+  export let process_count: number;
+  export let max_process_count: number;
+  export let enable_breakpoint: boolean;
 
-  $: maxCount = config?.max_process_count ?? 13;
+  const maxCount = max_process_count;
+  process_count = Math.min(max_process_count, process_count);
   $: step = Math.floor((maxCount - 1) / 4);
 </script>
 
@@ -21,12 +23,12 @@
 </div>
 
 <h1 class="text-2xl underline">How many processes to spawn?</h1>
-<h2 class="mt-16 mb-8 text-6xl">{config.process_count}</h2>
+<h2 class="mt-16 mb-8 text-6xl">{process_count}</h2>
 <input
   type="range"
   min="1"
   max={maxCount}
-  bind:value={config.process_count}
+  bind:value={process_count}
   class="range range-primary range-lg"
   step="1"
 />
