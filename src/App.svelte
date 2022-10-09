@@ -29,14 +29,15 @@
     "memory_transform",
     derived(selected, (s) => s.memory_transform)
   );
-  const getProcessGroup = derived(
-    selected,
-    (s) => () =>
-      new WebWorkerProcessGroup(
-        process_count,
-        $selected.algorithm_impl_builder,
-        $selected.get_memory
-      )
+  const getProcessGroup = derived(selected, (s, set) =>
+    set(
+      () =>
+        new WebWorkerProcessGroup(
+          process_count,
+          s.algorithm_impl_builder,
+          s.get_memory
+        )
+    )
   );
 </script>
 
