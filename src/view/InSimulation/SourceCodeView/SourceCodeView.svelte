@@ -4,7 +4,7 @@
   import { getContext } from "svelte";
 
   export let lineno: Readable<number> = null;
-  const source_code = getContext<[number, string][]>("source_code");
+  const source_code = getContext<Readable<[number, string][]>>("source_code");
   if (isNull(source_code) || isEmpty(source_code)) {
     throw new Error("empty source code");
   }
@@ -14,7 +14,7 @@
 <ol
   class="flex flex-col overflow-y-auto rounded bg-base-300 py-4 text-primary-content"
 >
-  {#each source_code as line}
+  {#each $source_code as line}
     {#if line[0] === $lineno}
       <li class="indicator ml-4">
         <span

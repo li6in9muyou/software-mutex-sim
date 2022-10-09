@@ -1,6 +1,6 @@
 <script lang="ts">
   import { every, range } from "lodash";
-  import { derived } from "svelte/store";
+  import { derived, get, type Readable } from "svelte/store";
   import { router } from "../model";
   import debug from "debug";
   import { getContext, onDestroy, onMount } from "svelte";
@@ -13,7 +13,7 @@
 
   export let getProcessGroup: () => IProcessGroup;
   const processGroup = getProcessGroup();
-  const enable_breakpoint = getContext("enable_breakpoint");
+  const enable_breakpoint = getContext<Readable<boolean>>("enable_breakpoint");
 
   if (enable_breakpoint === true || enable_breakpoint === false) {
     processGroup.all.set_breakpoint(enable_breakpoint);

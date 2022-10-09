@@ -3,7 +3,8 @@
   import { getContext } from "svelte";
 
   export let stores: Map<string, Readable<Array<number>>> = null;
-  const memory_transform = getContext<(number) => string>("memory_transform");
+  const memory_transform =
+    getContext<Readable<(number) => string>>("memory_transform");
 
   const memKeys = [...stores!.keys()];
   const memValues = memKeys.map((k) => stores.get(k));
@@ -26,7 +27,7 @@
           <div
             class="flex w-fit justify-center border border-secondary px-1 text-xl"
           >
-            {memory_transform(element)}
+            {$memory_transform(element)}
           </div>
         {/each}
       </div>
