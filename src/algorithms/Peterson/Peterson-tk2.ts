@@ -1,7 +1,7 @@
 import { expose } from "threads";
 const { Demo, break_point } = ImportBaseProcessModule();
 import { Idle, Yield } from "../utility";
-import { identity } from "lodash";
+import { identity } from "lodash-es";
 import { useMonitoredMemory } from "../../use_case/MemoryWriteSync";
 import ImportBaseProcessModule from "../../use_case/BaseProcess";
 

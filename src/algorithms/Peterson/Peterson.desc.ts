@@ -1,6 +1,6 @@
 import type IAlgorithmDef from "../IAlgorithmDef";
 import Desc from "./description.txt?raw";
-import { identity } from "lodash";
+import { identity } from "lodash-es";
 
 export default <IAlgorithmDef>{
   source_code: [

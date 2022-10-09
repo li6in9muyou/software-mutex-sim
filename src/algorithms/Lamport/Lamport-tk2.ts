@@ -1,7 +1,7 @@
 import { expose } from "threads";
 import ImportBaseProcessModule from "../../use_case/BaseProcess";
 import { Idle } from "../utility";
-import { max } from "lodash";
+import { max } from "lodash-es";
 import { FALSE, TRUE } from "./constants";
 import { useMonitoredMemory } from "../../use_case/MemoryWriteSync";
 

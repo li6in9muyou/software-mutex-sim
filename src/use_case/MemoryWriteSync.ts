@@ -1,5 +1,5 @@
 import { get, type Readable, type Writable, writable } from "svelte/store";
-import { identity, isArray, isFunction, isUndefined } from "lodash";
+import { identity, isArray, isFunction, isUndefined } from "lodash-es";
 import debug from "debug";
 import type { Subject } from "threads/observable";
 

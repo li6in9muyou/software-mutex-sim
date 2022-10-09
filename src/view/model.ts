@@ -1,5 +1,5 @@
 import { derived, get, writable } from "svelte/store";
-import { isEmpty } from "lodash";
+import { isEmpty } from "lodash-es";
 
 export type Pages = "AlgoSelection" | "AlgoConfig" | "InSimulation";
 

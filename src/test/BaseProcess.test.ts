@@ -1,4 +1,4 @@
-import { noop } from "lodash";
+import { noop } from "lodash-es";
 import { vi, it, describe, expect } from "vitest";
 import ImportBaseProcessModule from "../use_case/BaseProcess";
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import InSimulation from "./view/InSimulation/InSimulation.svelte";
   import AlgorithmSelect from "./view/AlgorithmSelect.svelte";
-  import { head } from "lodash";
+  import { head } from "lodash-es";
   import AlgorithmConfig from "./view/AlgorithmConfig.svelte";
   import SlidingPages from "./view/SlidingPages.svelte";
   import SlidingPagesAdapter from "./view/adapter/SlidingPagesAdapter.js";

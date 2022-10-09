@@ -1,7 +1,7 @@
 <script lang="ts">
   import type IProcess from "../../use_case/IProcess";
   import { ProcessLifeCycle } from "../../use_case/IProcessLifeCycle";
-  import { isFunction, isNull, some } from "lodash";
+  import { isFunction, isNull, some } from "lodash-es";
   import { LockingState } from "../../use_case/IProgram";
   import { get, type Readable } from "svelte/store";
   import { getContext } from "svelte";

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { find, join, times } from "lodash";
+  import { find, join, times } from "lodash-es";
   import { router } from "./model";
   import type IAlgorithmDef from "../algorithms/IAlgorithmDef";
 

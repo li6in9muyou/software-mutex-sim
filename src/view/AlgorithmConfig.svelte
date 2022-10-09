@@ -1,6 +1,6 @@
 <script lang="ts">
   import { router } from "./model";
-  import { range } from "lodash";
+  import { range } from "lodash-es";
 
   export let process_count: number;
   export let max_process_count: number;

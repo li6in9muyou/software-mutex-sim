@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { every, times } from "lodash";
+  import { every, times } from "lodash-es";
   import { derived, get, type Readable } from "svelte/store";
   import { router } from "../model";
   import debug from "debug";

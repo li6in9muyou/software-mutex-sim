@@ -1,6 +1,6 @@
 <script lang="ts">
   import { type Readable } from "svelte/store";
-  import { isEmpty, isNull } from "lodash";
+  import { isEmpty, isNull } from "lodash-es";
   import { getContext } from "svelte";
 
   export let lineno: Readable<number> = null;

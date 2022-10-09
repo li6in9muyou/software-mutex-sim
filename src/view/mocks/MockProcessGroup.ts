@@ -3,7 +3,7 @@ import type IProcessGroup from "../../use_case/IProcessGroup";
 import type { IProcessGroupQuery } from "../../use_case/IProcessGroup";
 import type IProcess from "../../use_case/IProcess";
 import type { IProcessCommand } from "../../use_case/IProcess";
-import { constant, times } from "lodash";
+import { constant, times } from "lodash-es";
 import { readable, writable } from "svelte/store";
 import { ProcessLifeCycle } from "../../use_case/IProcessLifeCycle";
 import type IProgram from "../../use_case/IProgram";
