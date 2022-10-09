@@ -3,13 +3,16 @@
   import { ProcessLifeCycle } from "../../use_case/IProcessLifeCycle";
   import { isFunction, isNull, some } from "lodash";
   import { LockingState } from "../../use_case/IProgram";
-  import { get } from "svelte/store";
+  import { get, type Readable } from "svelte/store";
+  import { getContext } from "svelte";
 
   export let selectedPid: number = null;
   export let ProcessHandle: IProcess = null;
   if (some([selectedPid, ProcessHandle], isNull)) {
     throw new Error("invalid arguments");
   }
+  const enableBreakpoint =
+    getContext<Readable<boolean>>("enable_breakpoint") ?? false;
   const pid = ProcessHandle.pid;
   let procState, in_region;
   ProcessHandle.execution_state.subscribe((v) => (procState = v));
@@ -32,11 +35,15 @@
     });
   }
   function handleStart() {
-    showPauseSpinnerUntilChange();
+    if (!$enableBreakpoint) {
+      showPauseSpinnerUntilChange();
+    }
     ProcessHandle.start();
   }
   function handleToggle() {
-    showPauseSpinnerUntilChange();
+    if (!$enableBreakpoint) {
+      showPauseSpinnerUntilChange();
+    }
     switch (procState) {
       case ProcessLifeCycle.paused: {
         ProcessHandle.resume();
@@ -63,6 +70,13 @@
   $: description =
     `${procStateDisplay.get(procState)} #${pid} ` +
     `${in_region ? "🔒✔" : "✖"}`;
+  let buttonFuncLabel;
+  $: if ($enableBreakpoint) {
+    buttonFuncLabel = "step";
+  } else {
+    buttonFuncLabel =
+      procState === ProcessLifeCycle.running ? "pause" : "resume";
+  }
 </script>
 
 <div
@@ -105,8 +119,10 @@
       </button>
     {:else}
       <button
-        class:btn-disabled={!isSelected}
-        class:btn-warning={procState === ProcessLifeCycle.running}
+        class:btn-disabled={!isSelected ||
+          (isSelected && in_region && $enableBreakpoint)}
+        class:btn-warning={procState === ProcessLifeCycle.running &&
+          !$enableBreakpoint}
         class:btn-success={procState === ProcessLifeCycle.paused}
         class="btn btn-sm ml-auto"
         on:click={handleToggle}
@@ -133,7 +149,7 @@
             />
           </svg>
         {/if}
-        {procState === ProcessLifeCycle.running ? "pause" : "resume"}
+        {buttonFuncLabel}
       </button>
     {/if}
   {/if}
