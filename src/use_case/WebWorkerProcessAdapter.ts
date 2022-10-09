@@ -14,6 +14,7 @@ export default class WebWorkerProcess implements IProcess {
   execution_state: Readable<ProcessLifeCycle>;
   program: IProgram;
   private readonly _source = new Subject();
+  private readonly wait_spawn: Promise<void>;
   get source() {
     return Observable.from(this._source);
   }
@@ -21,24 +22,27 @@ export default class WebWorkerProcess implements IProcess {
   private readonly note: debug.Debugger;
 
   async kill(): Promise<void> {
-    if (!isNull(this.impl)) {
-      await Thread.terminate(this.impl);
-    }
+    await this.wait_spawn;
+    await Thread.terminate(this.impl);
   }
 
   async pause(): Promise<void> {
+    await this.wait_spawn;
     await this.impl.request_pause();
   }
 
   async resume(): Promise<void> {
+    await this.wait_spawn;
     await this.impl.resume();
   }
 
   async start(): Promise<void> {
+    await this.wait_spawn;
     await this.impl.run(this.pid, this.shard_memory);
   }
 
   async set_breakpoint(to_be: boolean): Promise<void> {
+    await this.wait_spawn;
     if (to_be) {
       await this.impl.enable_breakpoints();
     } else {
@@ -55,7 +59,7 @@ export default class WebWorkerProcess implements IProcess {
     const sub = (msg) => {
       this._source.next(msg);
     };
-    (async () => {
+    this.wait_spawn = (async () => {
       const c = await spawn(
         new Worker(this.process_url, {
           type: "module",
@@ -65,11 +69,9 @@ export default class WebWorkerProcess implements IProcess {
       await c.core_msg().subscribe(sub);
       await c.debug_msg().subscribe(sub);
       await Thread.events(c).subscribe(sub);
-      return c;
-    })().then((p) => {
       this.note("spawned.");
-      this.impl = p;
-    });
+      this.impl = c;
+    })();
     const ob = new WebWorkerProcessObserver(this.pid, this.source);
     this.program = ob.program;
     this.execution_state = ob.execution_state;
