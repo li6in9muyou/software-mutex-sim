@@ -15,11 +15,6 @@
   const processGroup = getProcessGroup();
   const enable_breakpoint = getContext<Readable<boolean>>("enable_breakpoint");
 
-  if (enable_breakpoint === true || enable_breakpoint === false) {
-    processGroup.all.set_breakpoint(enable_breakpoint);
-  }else{
-    note(`enable_breakpoint=${enable_breakpoint}`)
-  }
   const process_count: number = processGroup.process_count;
   let manyProcess = processGroup;
   let memory_store = manyProcess.memory;
@@ -33,6 +28,14 @@
 
   onMount(() => {
     note("begin!");
+    const enable = get(enable_breakpoint);
+    setTimeout(() => {
+      if (enable === true || enable === false) {
+        processGroup.all.set_breakpoint(enable);
+      } else {
+        note(`enable_breakpoint=${enable}`);
+      }
+    }, 500);
   });
 
   onDestroy(() => {
