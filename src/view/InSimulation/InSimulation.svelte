@@ -68,6 +68,10 @@
     allPaused = false;
     manyProcess.all.kill();
   }
+
+  function onAllStep() {
+    manyProcess.all.resume();
+  }
 </script>
 
 <div class="navbar mb-2 rounded bg-base-200 shadow-xl">
@@ -76,20 +80,24 @@
   </div>
   <div class="navbar-end gap-2">
     {#if started && !$allCompleted}
-      <div
-        class="btn btn-warning"
-        class:btn-disabled={allPaused}
-        on:click={onToggleAllRunOrPause}
-      >
-        pause all
-      </div>
-      <div
-        class="btn btn-success"
-        class:btn-disabled={!allPaused}
-        on:click={onToggleAllRunOrPause}
-      >
-        resume all
-      </div>
+      {#if started && $enable_breakpoint}
+        <div class="btn btn-success" on:click={onAllStep}>step all</div>
+      {:else}
+        <div
+          class="btn btn-warning"
+          class:btn-disabled={allPaused}
+          on:click={onToggleAllRunOrPause}
+        >
+          pause all
+        </div>
+        <div
+          class="btn btn-success"
+          class:btn-disabled={!allPaused}
+          on:click={onToggleAllRunOrPause}
+        >
+          resume all
+        </div>
+      {/if}
     {:else if $allCompleted}
       <button class="btn btn-warning" on:click={onResetSim}> reset </button>
     {:else}
