@@ -6,7 +6,7 @@
   import { getContext, onDestroy, onMount } from "svelte";
   import Memory from "./Memory.svelte";
   import ProcessAgent from "./ProcessAgent.svelte";
-  import SourceCodeView from "./SourceCodeView/SourceCodeView.svelte";
+  import SourceCodeView from "./SourceCodeView.svelte";
   import type IProcessGroup from "../../use_case/IProcessGroup";
   import { ProcessLifeCycle } from "../../use_case/IProcessLifeCycle";
   const note = debug("InSimulation.svelte");
