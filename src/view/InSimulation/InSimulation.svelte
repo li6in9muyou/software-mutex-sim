@@ -109,7 +109,7 @@
 <main class="mt-4 flex max-h-[90vh] flex-col">
   <section>
     <h2 class="mb-2 text-2xl underline">inspect one process</h2>
-    <div class="flex max-h-64 flex-wrap gap-3 overflow-y-auto">
+    <div class="flex max-h-64 gap-3 overflow-y-auto">
       {#each range(0, process_count) as pid}
         <ProcessAgent bind:selectedPid ProcessHandle={manyProcess.pid(pid)} />
       {/each}

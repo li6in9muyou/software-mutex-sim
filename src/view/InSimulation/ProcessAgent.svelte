@@ -67,9 +67,9 @@
   $: isIdle =
     procState === ProcessLifeCycle.ready ||
     procState === ProcessLifeCycle.completed;
-  $: description =
-    `${procStateDisplay.get(procState)} #${pid} ` +
-    `${in_region ? "🔒✔" : "✖"}`;
+  $: description = `${procStateDisplay.get(procState)} ${
+    in_region ? "🔒" : "✖"
+  }`;
   let buttonFuncLabel;
   $: if ($enableBreakpoint) {
     buttonFuncLabel = "step";
@@ -84,11 +84,14 @@
   class:text-accent-content={isSelected}
   class:bg-base-100={!isSelected}
   class:text-base-content={!isSelected}
-  class="inline-flex w-fit items-center gap-3 rounded border border-accent p-1 text-xl transition-colors duration-300"
+  class="flex h-fit w-fit flex-col items-center gap-3 rounded border border-accent p-2 pt-0 text-xl transition-colors duration-300"
   on:click={() => (selectedPid = pid)}
 >
   <div>
-    {description}
+    {`#${pid}`}
+    <div class="whitespace-nowrap">
+      {description}
+    </div>
   </div>
   {#if isSelected}
     {#if isIdle}
