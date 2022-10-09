@@ -1,3 +1,4 @@
+import L from "./Lamport-tk2?worker";
 import type IAlgorithmDef from "../IAlgorithmDef";
 import { TRUE, FALSE } from "./constants";
 import LamportDescriptionText from "./description.txt?raw";
@@ -27,7 +28,7 @@ export default <IAlgorithmDef>{
         return v.toString();
     }
   },
-  algorithm_impl_url: new URL("./Lamport-tk2.ts", import.meta.url),
+  algorithm_impl_builder: () => new L(),
   get_memory: (process_count) => ({
     flag: new Int32Array(new SharedArrayBuffer(4 * process_count)).fill(FALSE),
     label: new Int32Array(new SharedArrayBuffer(4 * process_count)),

@@ -34,7 +34,7 @@
     (s) => () =>
       new WebWorkerProcessGroup(
         process_count,
-        $selected.algorithm_impl_url,
+        $selected.algorithm_impl_builder,
         $selected.get_memory
       )
   );

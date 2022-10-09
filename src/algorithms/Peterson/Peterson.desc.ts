@@ -1,3 +1,4 @@
+import P from "./Peterson-tk2?worker";
 import type IAlgorithmDef from "../IAlgorithmDef";
 import Desc from "./description.txt?raw";
 import { identity } from "lodash-es";
@@ -19,7 +20,7 @@ export default <IAlgorithmDef>{
   name: "Peterson's Algorithm",
   description: Desc,
   memory_transform: identity,
-  algorithm_impl_url: new URL("./Peterson-tk2.ts", import.meta.url),
+  algorithm_impl_builder: () => new P(),
   get_memory: (process_count) => ({
     level: new Int32Array(new SharedArrayBuffer(4 * process_count)),
     victim: new Int32Array(new SharedArrayBuffer(4 * process_count)),

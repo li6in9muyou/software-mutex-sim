@@ -39,7 +39,7 @@ export default class WebWorkerProcessGroup
   }
   constructor(
     public readonly process_count: number,
-    private readonly process_url: URL,
+    private readonly builder: () => Worker,
     private readonly get_memory: (process_count: number) => IMemory
   ) {
     const memory = this.get_memory(this.process_count);
@@ -49,7 +49,7 @@ export default class WebWorkerProcessGroup
     const [memory_store, memory_listener] =
       createMemorySyncStoreAndSync(memory);
     for (let pid = 0; pid < process_count; pid++) {
-      const process = new WebWorkerProcess(this.process_url, pid, memory);
+      const process = new WebWorkerProcess(this.builder, pid, memory);
       process.source.subscribe(memory_listener);
       this.processes.push(process);
     }

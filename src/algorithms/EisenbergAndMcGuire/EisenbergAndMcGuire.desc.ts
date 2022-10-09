@@ -1,9 +1,10 @@
+import E from "./EisenbergAndMcGuire-tk2?worker";
 import type IAlgorithmDef from "../IAlgorithmDef";
 import Desc from "./description.txt?raw";
 import { IDLE, IN_CS, WANT_IN } from "./constants";
 
 export default <IAlgorithmDef>{
-  algorithm_impl_url: new URL("./EisenbergAndMcGuire-tk2.ts", import.meta.url),
+  algorithm_impl_builder: () => new E(),
   description: Desc,
   get_memory: (process_count: number) => ({
     flag: new Int32Array(new SharedArrayBuffer(4 * process_count)),

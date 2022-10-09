@@ -51,7 +51,7 @@ export default class WebWorkerProcess implements IProcess {
   }
 
   constructor(
-    private readonly process_url: URL,
+    private readonly builder: () => Worker,
     public readonly pid: number,
     private readonly shard_memory
   ) {
@@ -60,11 +60,7 @@ export default class WebWorkerProcess implements IProcess {
       this._source.next(msg);
     };
     this.wait_spawn = (async () => {
-      const c = await spawn(
-        new Worker(this.process_url, {
-          type: "module",
-        })
-      );
+      const c = await spawn(this.builder());
       await c.memory_msg().subscribe(sub);
       await c.core_msg().subscribe(sub);
       await c.debug_msg().subscribe(sub);
