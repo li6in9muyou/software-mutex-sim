@@ -12,19 +12,17 @@
   const note = debug("InSimulation.svelte");
 
   export let getProcessGroup: () => IProcessGroup;
-  const processGroup = getProcessGroup();
+  let processGroup = getProcessGroup();
   const enable_breakpoint = getContext<Readable<boolean>>("enable_breakpoint");
 
   const process_count: number = processGroup.process_count;
-  let manyProcess = processGroup;
-  let memory_store = manyProcess.memory;
-  let processRunningState = derived(
-    manyProcess.all.execution_state,
-    (arr, set) => set(arr)
-  );
-  let allCompleted = derived(processRunningState, (arr) =>
-    every(arr, (s) => s === ProcessLifeCycle.completed)
-  );
+  let manyProcess, allCompleted;
+  $: {
+    manyProcess = processGroup;
+    allCompleted = derived(manyProcess.all.execution_state, (arr) =>
+      every(arr, (s) => s === ProcessLifeCycle.completed)
+    );
+  }
 
   onMount(() => {
     note("begin!");
@@ -67,6 +65,7 @@
     started = false;
     allPaused = false;
     manyProcess.all.kill();
+    processGroup = getProcessGroup();
   }
 
   function onAllStep() {
@@ -124,6 +123,6 @@
   </section>
   <div class="divider my-0" />
   <slot>
-    <Memory stores={memory_store} />
+    <Memory stores={manyProcess.memory} />
   </slot>
 </main>

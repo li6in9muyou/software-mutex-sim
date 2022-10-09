@@ -7,14 +7,17 @@
     getContext<Readable<(number) => string>>("memory_transform");
 
   const memKeys = [...stores!.keys()];
-  const memValues = memKeys.map((k) => stores.get(k));
-  const memory = derived(memValues, (ss, set) => {
-    const ans = {};
-    for (let i = 0; i < memValues.length; i++) {
-      ans[memKeys[i]] = ss[i];
-    }
-    set(ans);
-  });
+  let memValues, memory;
+  $: {
+    memValues = memKeys.map((k) => stores.get(k));
+    memory = derived(memValues, (ss, set) => {
+      const ans = {};
+      for (let i = 0; i < memValues.length; i++) {
+        ans[memKeys[i]] = ss[i];
+      }
+      set(ans);
+    });
+  }
 </script>
 
 <h2 class="mb-2 text-2xl underline">shared memory</h2>
