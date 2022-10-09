@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { every, range } from "lodash";
+  import { every, times } from "lodash";
   import { derived, get, type Readable } from "svelte/store";
   import { router } from "../model";
   import debug from "debug";
@@ -12,13 +12,13 @@
   const note = debug("InSimulation.svelte");
 
   export let getProcessGroup: () => IProcessGroup;
-  let processGroup = getProcessGroup();
+  let manyProcess = getProcessGroup();
   const enable_breakpoint = getContext<Readable<boolean>>("enable_breakpoint");
 
-  const process_count: number = processGroup.process_count;
-  let manyProcess, allCompleted;
+  const process_count: number = manyProcess.process_count;
+  let allCompleted, processes;
   $: {
-    manyProcess = processGroup;
+    processes = times(process_count, (pid) => manyProcess.pid(pid));
     allCompleted = derived(manyProcess.all.execution_state, (arr) =>
       every(arr, (s) => s === ProcessLifeCycle.completed)
     );
@@ -29,7 +29,7 @@
     const enable = get(enable_breakpoint);
     setTimeout(() => {
       if (enable === true || enable === false) {
-        processGroup.all.set_breakpoint(enable);
+        manyProcess.all.set_breakpoint(enable);
       } else {
         note(`enable_breakpoint=${enable}`);
       }
@@ -65,7 +65,7 @@
     started = false;
     allPaused = false;
     manyProcess.all.kill();
-    processGroup = getProcessGroup();
+    manyProcess = getProcessGroup();
   }
 
   function onAllStep() {
@@ -109,8 +109,8 @@
   <section>
     <h2 class="mb-2 text-2xl underline">inspect one process</h2>
     <div class="flex max-h-64 gap-3 overflow-y-auto">
-      {#each range(0, process_count) as pid}
-        <ProcessAgent bind:selectedPid ProcessHandle={manyProcess.pid(pid)} />
+      {#each processes as process}
+        <ProcessAgent bind:selectedPid ProcessHandle={process} />
       {/each}
     </div>
   </section>

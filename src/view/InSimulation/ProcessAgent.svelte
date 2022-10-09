@@ -15,8 +15,8 @@
     getContext<Readable<boolean>>("enable_breakpoint") ?? false;
   const pid = ProcessHandle.pid;
   let procState, in_region;
-  ProcessHandle.execution_state.subscribe((v) => (procState = v));
-  ProcessHandle.program.locking_state.subscribe(
+  $: ProcessHandle.execution_state.subscribe((v) => (procState = v));
+  $: ProcessHandle.program.locking_state.subscribe(
     (v) => (in_region = v === LockingState.Locked)
   );
 
