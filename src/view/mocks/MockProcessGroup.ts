@@ -3,7 +3,7 @@ import type IProcessGroup from "../../use_case/IProcessGroup";
 import type { IProcessGroupQuery } from "../../use_case/IProcessGroup";
 import type IProcess from "../../use_case/IProcess";
 import type { IProcessCommand } from "../../use_case/IProcess";
-import { times } from "lodash";
+import { constant, times } from "lodash";
 import { readable, writable } from "svelte/store";
 import { ProcessLifeCycle } from "../../use_case/IProcessLifeCycle";
 import type IProgram from "../../use_case/IProgram";
@@ -40,9 +40,10 @@ export default class MockProcessGroup implements IProcessGroup {
       resume: this.noop.bind(this),
       pause: this.noop.bind(this),
       kill: this.noop.bind(this),
+      set_breakpoint: this.noop.bind(this),
     };
     this.memory = new Map([
-      ["level", readable(Array.of(1989, 64, 2, 3))],
+      ["level", readable(times(this.process_count, constant(1989)))],
       ["turn", readable(Array.of(42))],
     ]);
 
@@ -51,6 +52,7 @@ export default class MockProcessGroup implements IProcessGroup {
       resume: this.wait_then_set(pid, ProcessLifeCycle.running),
       pause: this.wait_then_set(pid, ProcessLifeCycle.paused),
       kill: this.noop.bind(this),
+      set_breakpoint: this.noop.bind(this),
       program: this._prog[pid],
       execution_state: this._exec_state[pid],
       pid,
