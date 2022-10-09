@@ -12,7 +12,13 @@
 
   const availableAlgorithms = Array.from(AlgorithmTable.values());
   let selected = writable(head(availableAlgorithms));
-  let process_count = 4;
+  const default_process_count = 4;
+  const default_max_process_count = 20;
+  let process_count = default_process_count;
+  const max_process_count = derived(
+    selected,
+    (s) => s?.max_process_count ?? default_max_process_count
+  );
   let enable_breakpoint = writable(false);
   setContext("enable_breakpoint", enable_breakpoint);
   setContext(
@@ -46,7 +52,7 @@
       <AlgorithmConfig
         bind:process_count
         bind:enable_breakpoint={$enable_breakpoint}
-        max_process_count={$selected?.max_process_count ?? 13}
+        max_process_count={$max_process_count}
       />
     </slot>
     <slot slot="right">
