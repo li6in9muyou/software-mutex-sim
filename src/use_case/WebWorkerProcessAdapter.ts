@@ -8,7 +8,7 @@ import { LockingState } from "./IProgram";
 import { spawn, Thread } from "threads";
 import { Observable, Subject } from "threads/observable";
 import debug from "debug";
-import { isNull, isUndefined } from "lodash";
+import { isUndefined } from "lodash";
 
 export default class WebWorkerProcess implements IProcess {
   execution_state: Readable<ProcessLifeCycle>;
