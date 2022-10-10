@@ -15,7 +15,7 @@ export function useMonitoredMemory(
     return {
       set(buffer: Int32Array, index: string, value: number) {
         buffer[Number(index)] = value;
-        sync.next([slice, Array.from(buffer)]);
+        sync.next([slice, Number(index), value]);
         return true;
       },
       get(buffer: Int32Array, index: number) {
@@ -57,13 +57,16 @@ export function createMemorySyncStoreAndSync(
   }
 
   function handler(msg: MemorySyncMessage) {
-    if (isArray(msg) && msg.length === 2) {
-      const [which, array] = msg;
+    if (isArray(msg) && msg.length === 3) {
+      const [which, index, val] = msg;
       const s = get(stores);
 
-      d("attempting to update store %s %o", which, array);
+      d("attempting to update store %s %d %d", which, index, val);
       if (!isUndefined(s[which])) {
-        s[which].set(array);
+        s[which].update((arr) => {
+          arr[index] = val;
+          return arr;
+        });
         stores.set(s);
         d("success");
       } else {

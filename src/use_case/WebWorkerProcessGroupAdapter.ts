@@ -10,6 +10,7 @@ import { get, writable } from "svelte/store";
 import debug from "debug";
 import type { ProcessLifeCycle } from "./IProcessLifeCycle";
 import type IProgram from "./IProgram";
+import { isArray } from "lodash-es";
 const note = debug("WebWorkerProcessGroup");
 
 export default class WebWorkerProcessGroup
@@ -50,7 +51,12 @@ export default class WebWorkerProcessGroup
       createMemorySyncStoreAndSync(memory);
     for (let pid = 0; pid < process_count; pid++) {
       const process = new WebWorkerProcess(this.builder, pid, memory);
-      process.source.subscribe(memory_listener);
+      process.source.subscribe((args) => {
+        memory_listener(args);
+        if (isArray(args) && args.length === 3) {
+          this.processes.map((process) => process.impl.update(args));
+        }
+      });
       this.processes.push(process);
     }
     memory_store.subscribe((stores) => {

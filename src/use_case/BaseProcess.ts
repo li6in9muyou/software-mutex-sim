@@ -10,6 +10,7 @@ import {
   Ready,
   Running,
 } from "./ReportingEvents";
+import { Idle } from "../algorithms/utility";
 
 export default () => {
   let shouldPause = false;
@@ -45,6 +46,7 @@ export default () => {
     _running_sync_msg.next(Ready());
     return async (useMessageBus, pid: number, ...args: any[]) => {
       _running_sync_msg.next(Running());
+      await Idle(0.2);
       await lock_impl(useMessageBus, pid, ...args);
       _core_msg.next(Pre());
       await critical_region();
@@ -75,8 +77,12 @@ export default () => {
   function disable_breakpoints() {
     _pauseAtEveryBreakpoint = false;
   }
-
+  let local_copy = {};
   const Demo = (lock_impl, unlock_impl, critical_region) => ({
+    update(ev) {
+      const [slice, index, arr] = ev;
+      local_copy[slice][index] = arr;
+    },
     memory_msg() {
       return Observable.from(_mem_msg);
     },
@@ -111,12 +117,12 @@ export default () => {
     async run(pid: number, ...args: any[]) {
       dbg(`${pid} starts running with args ${JSON.stringify(args)}`);
       _i = pid;
-
+      local_copy = { ...args.pop() };
       const ans = await lock_critical_region_unlock_cycle(
         lock_impl,
         unlock_impl,
         critical_region
-      )(use_message_bus, pid, ...args);
+      )(use_message_bus, pid, ...args, local_copy);
 
       dbg(`${pid} completed`);
       disable_breakpoints();

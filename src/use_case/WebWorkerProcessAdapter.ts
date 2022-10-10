@@ -18,7 +18,7 @@ export default class WebWorkerProcess implements IProcess {
   get source() {
     return Observable.from(this._source);
   }
-  private impl: any = null;
+  public impl: any = null;
   private readonly note: debug.Debugger;
 
   async kill(): Promise<void> {
@@ -38,7 +38,7 @@ export default class WebWorkerProcess implements IProcess {
 
   async start(): Promise<void> {
     await this.wait_spawn;
-    await this.impl.run(this.pid, this.shard_memory);
+    await this.impl.run(this.pid, this.init_memory);
   }
 
   async set_breakpoint(to_be: boolean): Promise<void> {
@@ -53,7 +53,7 @@ export default class WebWorkerProcess implements IProcess {
   constructor(
     private readonly builder: () => Worker,
     public readonly pid: number,
-    private readonly shard_memory
+    private readonly init_memory
   ) {
     this.note = debug(`WebWorkerProcess[${pid}]`);
     const sub = (msg) => {
