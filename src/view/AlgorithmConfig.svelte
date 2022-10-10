@@ -8,7 +8,7 @@
 
   const maxCount = max_process_count;
   process_count = Math.min(max_process_count, process_count);
-  $: step = Math.floor((maxCount - 1) / 4);
+  $: step = Math.floor(maxCount / 5);
 </script>
 
 <div class="navbar mb-2 rounded bg-base-200 shadow-xl">
@@ -34,11 +34,16 @@
   class="range range-primary range-lg"
   step="1"
 />
-<div class="flex w-full justify-between px-2">
-  {#each range(1, maxCount, step) as stop}
-    <span class="text-2xl">{stop}</span>
+<div class="relative mx-2 flex h-8 w-full justify-between px-2">
+  {#each range(1, Math.max(2, maxCount - 1), step) as stop, idx}
+    <span
+      class="absolute {stop > 9 && `-translate-x-1/2`} text-2xl"
+      style="left:{(100 * idx * step) / maxCount}%;"
+    >
+      {stop}
+    </span>
   {/each}
-  <span class="text-2xl">{maxCount}</span>
+  <span class="absolute right-0 -translate-x-1/2 text-2xl">{maxCount}</span>
 </div>
 <div class="divider" />
 <div class="form-control mt-12">
