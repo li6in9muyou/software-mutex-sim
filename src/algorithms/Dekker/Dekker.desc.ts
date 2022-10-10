@@ -38,9 +38,7 @@ export default <IAlgorithmDef>{
   },
   algorithm_impl_builder: () => new D(),
   get_memory: (process_count) => ({
-    wants_to_enter: new Int32Array(
-      new SharedArrayBuffer(4 * process_count)
-    ).fill(FALSE),
-    turn: new Int32Array(new SharedArrayBuffer(4)),
+    wants_to_enter: new Array(process_count).fill(FALSE),
+    turn: [1],
   }),
 };
