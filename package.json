@@ -32,6 +32,7 @@
     "debug": "^4.3.4",
     "lodash-es": "^4.17.21",
     "observable-fns": "^0.6.1",
+    "svelte-icons": "^2.1.0",
     "threads": "^1.7.0"
   }
 }

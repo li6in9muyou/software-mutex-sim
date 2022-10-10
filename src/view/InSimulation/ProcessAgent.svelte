@@ -6,6 +6,7 @@
   import { get, type Readable } from "svelte/store";
   import { getContext } from "svelte";
   import SpinnerAndText from "./SpinnerAndText.svelte";
+  import AtOneGlance from "./AtOneGlance.svelte";
 
   export let selectedPid: number = null;
   export let ProcessHandle: IProcess = null;
@@ -57,20 +58,11 @@
     }
   }
 
-  const procStateDisplay = new Map([
-    [ProcessLifeCycle.ready, "▶"],
-    [ProcessLifeCycle.completed, "✅"],
-    [ProcessLifeCycle.running, "🏃"],
-    [ProcessLifeCycle.paused, "⏸"],
-  ]);
-
   $: isSelected = pid === selectedPid;
   $: isIdle =
     procState === ProcessLifeCycle.ready ||
     procState === ProcessLifeCycle.completed;
-  $: description = `${procStateDisplay.get(procState)} ${
-    in_region ? "🔒" : "✖"
-  }`;
+
   let buttonFuncLabel;
   $: if ($enableBreakpoint) {
     buttonFuncLabel = "step";
@@ -81,19 +73,15 @@
 </script>
 
 <div
-  class:bg-secondary={isSelected}
-  class:text-accent-content={isSelected}
+  class:bg-base-300={isSelected}
+  class:border-accent={isSelected}
+  class:text-secondary-content={isSelected}
   class:bg-base-100={!isSelected}
   class:text-base-content={!isSelected}
-  class="flex h-fit w-fit flex-col items-start gap-3 rounded border border-accent p-2 pt-0 text-xl transition-colors duration-300"
+  class="flex h-fit w-fit flex-col items-start gap-3 rounded border border-secondary p-2 pt-0 text-xl transition-colors duration-300"
   on:click={() => (selectedPid = pid)}
 >
-  <div>
-    {`#${pid}`}
-    <div class="whitespace-nowrap">
-      {description}
-    </div>
-  </div>
+  <AtOneGlance {pid} {procState} locked={in_region} />
   {#if isSelected}
     {#if isIdle}
       <button class="btn btn-success btn-sm ml-auto" on:click={handleStart}>
