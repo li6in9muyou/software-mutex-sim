@@ -30,7 +30,7 @@ export default <IAlgorithmDef>{
   },
   algorithm_impl_builder: () => new L(),
   get_memory: (process_count) => ({
-    flag: new Int32Array(new SharedArrayBuffer(4 * process_count)).fill(FALSE),
-    label: new Int32Array(new SharedArrayBuffer(4 * process_count)),
+    flag: new Array(process_count).fill(FALSE),
+    label: new Array(process_count).fill(0),
   }),
 };
