@@ -47,9 +47,10 @@ async function lock(use_msg, who, memory) {
   await bp(101);
 }
 
-async function unlock(use_msgs, who, memory, process_count) {
+async function unlock(use_msgs, who, memory) {
   const [dbg, , mPipe] = use_msgs();
   const { flag, turn } = useMonitoredMemory(mPipe, memory);
+  const process_count = flag.length;
   await bp(50);
   let pid = (turn[0] + 1) % process_count;
   while (true) {
