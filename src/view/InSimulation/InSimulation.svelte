@@ -77,20 +77,22 @@
   <div class="navbar-start">
     <div class="btn" on:click={() => router.pop()}>back</div>
   </div>
-  <div class="navbar-end gap-2">
+  <div class="navbar-end relative h-12 gap-2">
     {#if started && !$allCompleted}
       {#if started && $enable_breakpoint}
-        <div class="btn btn-success" on:click={onAllStep}>step all</div>
+        <div class="btn btn-success absolute right-0" on:click={onAllStep}>
+          step all
+        </div>
       {:else}
         <div
-          class="btn btn-warning"
+          class="btn btn-warning absolute right-0"
           class:btn-disabled={allPaused}
           on:click={onToggleAllRunOrPause}
         >
           pause all
         </div>
         <div
-          class="btn btn-success"
+          class="btn btn-success absolute right-0"
           class:btn-disabled={!allPaused}
           on:click={onToggleAllRunOrPause}
         >
@@ -98,9 +100,13 @@
         </div>
       {/if}
     {:else if $allCompleted}
-      <button class="btn btn-warning" on:click={onResetSim}> reset </button>
+      <button class="btn btn-warning absolute right-0" on:click={onResetSim}>
+        reset
+      </button>
     {:else}
-      <button class="btn btn-success" on:click={onStartSim}> start </button>
+      <button class="btn btn-success absolute right-0" on:click={onStartSim}>
+        start
+      </button>
     {/if}
   </div>
 </div>

@@ -15,8 +15,11 @@
   <div class="navbar-start">
     <div class="btn" on:click={() => router.pop()}>back</div>
   </div>
-  <div class="navbar-end gap-2">
-    <div class="btn btn-success" on:click={() => router.push("InSimulation")}>
+  <div class="navbar-end relative h-12 gap-2">
+    <div
+      class="btn btn-success absolute right-0 h-10"
+      on:click={() => router.push("InSimulation")}
+    >
       go
     </div>
   </div>

@@ -20,8 +20,13 @@
   <div class="navbar-start">
     <div class="btn btn-ghost text-4xl normal-case text-accent">MutexSim</div>
   </div>
-  <div class="navbar-end">
-    <div class="btn" on:click={() => router.push("AlgoConfig")}>next</div>
+  <div class="navbar-end relative h-10">
+    <div
+      class="btn absolute right-0"
+      on:click={() => router.push("AlgoConfig")}
+    >
+      next
+    </div>
   </div>
 </div>
 
