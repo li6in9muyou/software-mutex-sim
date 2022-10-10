@@ -7,8 +7,8 @@ export default <IAlgorithmDef>{
   algorithm_impl_builder: () => new E(),
   description: Desc,
   get_memory: (process_count: number) => ({
-    flag: new Int32Array(new SharedArrayBuffer(4 * process_count)),
-    turn: new Int32Array(new SharedArrayBuffer(4)),
+    flag: new Array(process_count).fill(0),
+    turn: [0],
   }),
   memory_transform: (v: number) => {
     switch (v) {
