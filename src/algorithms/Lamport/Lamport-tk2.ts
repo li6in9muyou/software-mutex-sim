@@ -25,6 +25,7 @@ async function lock(use_msg, pid, memory) {
   const { flag, label } = useMonitoredMemory(mPipe, memory);
   dbg.next("memory", flag, label);
 
+  await Idle(0.1 * Math.random());
   flag[pid] = TRUE;
   await break_point(1);
   label[pid] = max(label) + 1;
