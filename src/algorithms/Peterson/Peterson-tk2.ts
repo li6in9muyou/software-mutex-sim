@@ -34,6 +34,7 @@ async function lock(use_msg, pid, memory) {
     do {
       await break_point(100);
       await Yield();
+      await Idle(Math.random() * 0.5 + 0.1);
     } while (!can_proceed(pid, i, level, victim));
 
     await break_point(5);

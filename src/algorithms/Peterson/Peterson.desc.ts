@@ -22,7 +22,7 @@ export default <IAlgorithmDef>{
   memory_transform: identity,
   algorithm_impl_builder: () => new P(),
   get_memory: (process_count) => ({
-    level: new Int32Array(new SharedArrayBuffer(4 * process_count)),
-    victim: new Int32Array(new SharedArrayBuffer(4 * process_count)),
+    level: new Array(process_count).fill(0),
+    victim: new Array(process_count).fill(0),
   }),
 };
