@@ -1,6 +1,6 @@
 import L from "./Lamport-tk2?worker";
 import type IAlgorithmDef from "../IAlgorithmDef";
-import { TRUE, FALSE } from "./constants";
+import { TRUE, FALSE, NO_TICKET } from "./constants";
 import LamportDescriptionText from "./description.txt?raw";
 
 export default <IAlgorithmDef>{
@@ -24,6 +24,9 @@ export default <IAlgorithmDef>{
       case FALSE: {
         return "FALSE";
       }
+      case NO_TICKET: {
+        return "X";
+      }
       default:
         return v.toString();
     }
@@ -31,6 +34,6 @@ export default <IAlgorithmDef>{
   algorithm_impl_builder: () => new L(),
   get_memory: (process_count) => ({
     flag: new Array(process_count).fill(FALSE),
-    label: new Array(process_count).fill(0),
+    label: new Array(process_count).fill(NO_TICKET),
   }),
 };

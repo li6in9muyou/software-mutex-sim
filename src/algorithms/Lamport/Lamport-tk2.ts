@@ -2,7 +2,7 @@ import { expose } from "threads";
 import ImportBaseProcessModule from "../../use_case/BaseProcess";
 import { Idle } from "../utility";
 import { max } from "lodash-es";
-import { FALSE, TRUE } from "./constants";
+import { FALSE, NO_TICKET, TRUE } from "./constants";
 import { useMonitoredMemory } from "../../use_case/MemoryWriteSync";
 
 const { Demo, break_point, pause_stub } = ImportBaseProcessModule();
@@ -12,6 +12,7 @@ function should_wait(who: number, ...memory: Int32Array[]): boolean {
   return Array.from(label)
     .map((ticket, idx) => [ticket, idx])
     .filter(([, pid]) => pid !== who)
+    .filter(([ticket, _]) => ticket != NO_TICKET)
     .filter(([, pid]) => flag[pid] === TRUE)
     .map(([ticket, pid]) =>
       ticket === label[who] ? pid < who : ticket < label[who]
