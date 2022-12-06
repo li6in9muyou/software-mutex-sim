@@ -3,7 +3,7 @@ import { identity, isArray, isFunction, isUndefined } from "lodash-es";
 import debug from "debug";
 import type { Subject } from "threads/observable";
 
-export type IMemory = { [key: string]: Int32Array };
+export type IMemory = { [key: string]: number[] };
 
 export type MemorySyncMessage = [string, Array<number>];
 
