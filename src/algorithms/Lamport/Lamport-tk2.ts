@@ -45,8 +45,8 @@ async function unlock(use_msgs, who, memory) {
   await pause_stub();
   const { flag } = useMonitoredMemory(mPipe, memory);
 
-  flag[who] = FALSE;
   await break_point(5);
+  flag[who] = FALSE;
 
   dbg.next("unlock");
   await pause_stub();
